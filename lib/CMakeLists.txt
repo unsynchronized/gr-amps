@@ -22,7 +22,10 @@
 ########################################################################
 include(GrPlatform) #define LIB_SUFFIX
 
-include_directories(${Boost_INCLUDE_DIR})
+include_directories(
+    ${Boost_INCLUDE_DIR}
+    ${ITPP_INCLUDE_DIR}
+)
 link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND amps_sources
@@ -35,7 +38,7 @@ if(NOT amps_sources)
 endif(NOT amps_sources)
 
 add_library(gnuradio-amps SHARED ${amps_sources})
-target_link_libraries(gnuradio-amps ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES})
+target_link_libraries(gnuradio-amps ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} ${ITPP_LIBRARIES})
 set_target_properties(gnuradio-amps PROPERTIES DEFINE_SYMBOL "gnuradio_amps_EXPORTS")
 
 if(APPLE)
@@ -72,6 +75,7 @@ target_link_libraries(
   ${GNURADIO_RUNTIME_LIBRARIES}
   ${Boost_LIBRARIES}
   ${CPPUNIT_LIBRARIES}
+  ${ITPP_LIBRARIES}
   gnuradio-amps
 )
 
