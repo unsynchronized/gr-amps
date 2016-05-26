@@ -2,7 +2,7 @@
 <block>
   <name>AMPS FOCC</name>
   <key>amps_focc</key>
-  <category>amps</category>
+  <category>AMPS</category>
   <import>import amps</import>
   <make>amps.focc($symrate)</make>
     <param>

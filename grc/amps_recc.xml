@@ -2,7 +2,7 @@
 <block>
   <name>AMPS RECC</name>
   <key>amps_recc</key>
-  <category>amps</category>
+  <category>AMPS</category>
   <import>import amps</import>
   <make>amps.recc()</make>
 
