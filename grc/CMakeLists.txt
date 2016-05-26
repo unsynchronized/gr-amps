@@ -18,5 +18,6 @@
 # Boston, MA 02110-1301, USA.
 
 install(FILES
-    amps_focc.xml DESTINATION share/gnuradio/grc/blocks
+    amps_focc.xml
+    amps_recc.xml DESTINATION share/gnuradio/grc/blocks
 )

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<block>
+  <name>AMPS RECC</name>
+  <key>amps_recc</key>
+  <category>amps</category>
+  <import>import amps</import>
+  <make>amps.recc()</make>
+
+  <sink>
+    <name>in</name>
+    <type>byte</type>
+    <vlen>1</vlen>		<!-- XXX: necessary?  remove -->
+  </sink>
+</block>
