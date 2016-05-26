@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<block>
+  <name>AMPS FOCC</name>
+  <key>amps_focc</key>
+  <category>amps</category>
+  <import>import amps</import>
+  <make>amps.focc($symrate)</make>
+    <param>
+        <name>Symbol Rate</name>
+        <key>symrate</key>
+        <type>real</type>
+    </param>
+
+    <source>
+        <name>out</name>
+        <type>byte</type>
+        <vlen>1</vlen>          <!-- XXX XXX XXX XXX XXX XXX XXX: WHY? REMOVE -->
+    </source>
+</block>

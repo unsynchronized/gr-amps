@@ -8,6 +8,9 @@
 %include "amps_swig_doc.i"
 
 %{
+#include "amps/focc.h"
 %}
 
 
+%include "amps/focc.h"
+GR_SWIG_BLOCK_MAGIC2(amps, focc);

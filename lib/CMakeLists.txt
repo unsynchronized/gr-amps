@@ -29,6 +29,8 @@ include_directories(
 link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND amps_sources
+    focc_impl.cc
+    utils.cc
 )
 
 set(amps_sources "${amps_sources}" PARENT_SCOPE)

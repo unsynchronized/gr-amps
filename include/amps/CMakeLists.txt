@@ -22,5 +22,5 @@
 ########################################################################
 install(FILES
     api.h
-    DESTINATION include/amps
+    focc.h DESTINATION include/amps
 )
