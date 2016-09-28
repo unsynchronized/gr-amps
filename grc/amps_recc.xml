@@ -11,4 +11,10 @@
     <type>byte</type>
     <vlen>1</vlen>		<!-- XXX: necessary?  remove -->
   </sink>
+
+  <source>
+    <name>bursts</name>
+    <type>message</type>
+    <optional>1</optional>
+  </source>
 </block>

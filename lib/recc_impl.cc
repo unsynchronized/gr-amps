@@ -76,6 +76,8 @@ namespace gr {
             trigger_data = new unsigned char[trigger_len]();
             manchester_encode(trigbuf, strlen(trigbuf), trigger_data);
             XXXbitcount = 0;
+
+            message_port_register_out(pmt::mp("bursts"));
         }
 
         recc_impl::~recc_impl()
@@ -121,6 +123,7 @@ namespace gr {
                 if(start != NULL) {
                     XXXnext = 1;
                     busy_idle_bit = 0;
+                    message_port_pub(pmt::mp("bursts"), pmt::mp("yoyo 123"));
                     printf("XXX YO GOT IT @%lu  start %p  d_symbuf %p  noutput_items %d  trigger_len %lu  searchsz %lu\n", XXXbitcount, start, d_symbuf, noutput_items, trigger_len, searchsz);
                     //printout(trigger_data, trigger_len);
                     //printout(start, trigger_len);

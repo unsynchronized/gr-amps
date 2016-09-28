@@ -32,6 +32,7 @@ list(APPEND amps_sources
     focc_impl.cc
     utils.cc
     recc_impl.cc
+    recc_decode_impl.cc
 )
 
 set(amps_sources "${amps_sources}" PARENT_SCOPE)

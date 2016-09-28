@@ -23,5 +23,6 @@
 install(FILES
     api.h
     focc.h
-    recc.h DESTINATION include/amps
+    recc.h
+    recc_decode.h DESTINATION include/amps
 )

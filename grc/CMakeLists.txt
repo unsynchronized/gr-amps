@@ -19,5 +19,6 @@
 
 install(FILES
     amps_focc.xml
-    amps_recc.xml DESTINATION share/gnuradio/grc/blocks
+    amps_recc.xml
+    amps_recc_decode.xml DESTINATION share/gnuradio/grc/blocks
 )

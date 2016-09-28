@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<block>
+  <name>AMPS RECC Decode</name>
+  <key>amps_recc_decode</key>
+  <category>AMPS</category>
+  <import>import amps</import>
+  <make>amps.recc_decode()</make>
+
+  <sink>
+    <name>bursts</name>
+    <type>message</type>
+    <optional>1</optional>
+  </sink>
+</block>
