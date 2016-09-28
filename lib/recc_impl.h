@@ -31,12 +31,14 @@ namespace gr {
         size_t d_symbufsz;          // size of d_symbuf
         unsigned char *d_symbuf;    // buffer of incoming symbols
         size_t d_symbuflen;         // current length of d_symbuf
+        unsigned char *d_curstart;  // ptr to start of trigger sequence, if currently in d_symbuf; NULL if it isn't
 
         // The minimum number of previous symbols to keep around; practically,
         // the largest size you might want to extract at once minus one.
         size_t d_windowsz;
 
-        size_t trigger_len;
+        size_t capture_len;         // length of symbols to capture after the trigger sequence
+        size_t trigger_len;         // length of trigger buffer in bytes
         unsigned char *trigger_data;
         unsigned long XXXbitcount;
 

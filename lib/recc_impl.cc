@@ -18,6 +18,7 @@
 #include <vector>
 #include "utils.h"
 
+using std::ptrdiff_t;
 using std::vector;
 using std::string;
 using std::cout;
@@ -65,7 +66,7 @@ namespace gr {
 
         recc_impl::recc_impl()
           : d_symbufsz(65536), d_symbuflen(0),
-          d_windowsz(4096), 
+          d_windowsz(4096), d_curstart(NULL), capture_len(1000),
           sync_block("recc",
                   io_signature::make(1, 1, sizeof (unsigned char)),
                   io_signature::make(0, 0, 0))
@@ -102,6 +103,7 @@ namespace gr {
             if((d_symbuflen + noutput_items) > d_symbufsz) {
                 memmove(d_symbuf, &d_symbuf[d_symbufsz - d_windowsz], d_windowsz);
                 d_symbuflen = d_windowsz;
+                d_curstart = NULL;
             }
             assert((d_symbuflen + noutput_items) <= d_symbufsz);
             memmove(&d_symbuf[d_symbuflen], in, noutput_items);
@@ -111,13 +113,27 @@ namespace gr {
             if(d_symbuflen > trigger_len) {
                 size_t searchsz = MIN(d_symbuflen, (noutput_items + trigger_len - 1));
                 assert(searchsz <= d_symbufsz && searchsz <= d_symbuflen);
-                unsigned char *start = (unsigned char *)memmem(&d_symbuf[d_symbuflen - searchsz], searchsz, trigger_data, trigger_len);
-                if(start != NULL) {
+                if(d_curstart == NULL) {
+                    d_curstart = (unsigned char *)memmem(&d_symbuf[d_symbuflen - searchsz], searchsz, trigger_data, trigger_len);
+                }
+
+                if(d_curstart != NULL) {
+                    ptrdiff_t startoff = (d_curstart - d_symbuf);
                     busy_idle_bit = 0;
-                    message_port_pub(pmt::mp("bursts"), pmt::mp("yoyo 123"));
-                    printf("XXX YO GOT IT @%lu  start %p  d_symbuf %p  noutput_items %d  trigger_len %lu  searchsz %lu\n", XXXbitcount, start, d_symbuf, noutput_items, trigger_len, searchsz);
-                    //printout(trigger_data, trigger_len);
-                    //printout(start, trigger_len);
+                    ptrdiff_t capturedsyms = d_symbuflen - startoff - trigger_len;
+                    if(capturedsyms > capture_len) {
+                        message_port_pub(pmt::mp("bursts"), pmt::mp("yoyo 123"));
+                        printf("XXX YO GOT IT off %tu  d_symbuflen %zu  capturedsyms %tu  trigger_len %zu   bit @%lu  d_symbuf %p  noutput_items %d  trigger_len %lu  searchsz %lu\n", startoff, d_symbuflen, capturedsyms, trigger_len, XXXbitcount, d_symbuf, noutput_items, trigger_len, searchsz);
+                        ptrdiff_t tomove = d_symbuflen - (capturedsyms + trigger_len);
+                        assert(tomove >= 0);
+                        if(tomove > 0) {
+                            memmove(d_symbuf, &d_symbuf[(capturedsyms + trigger_len)], tomove);
+                        }
+                        d_symbuflen -= tomove;
+                        d_curstart = NULL;
+                        //printout(trigger_data, trigger_len);
+                        //printout(start, trigger_len);
+                    }
                 }
             }
 
