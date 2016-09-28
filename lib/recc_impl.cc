@@ -88,19 +88,11 @@ namespace gr {
 
 
 
-        static int XXXnext = 0;
         int
         recc_impl::work(int noutput_items,
                   gr_vector_const_void_star &input_items,
                   gr_vector_void_star &output_items) {
             const unsigned char *in = (const unsigned char *)input_items[0];
-
-            if(XXXnext > 0) {
-                XXXnext--;
-                if(XXXnext == 0) {
-                    busy_idle_bit = 0;
-                }
-            }
 
             if(noutput_items < 1) {
                 printf("XXX noutput_items is %d\n", noutput_items);
@@ -121,7 +113,6 @@ namespace gr {
                 assert(searchsz <= d_symbufsz && searchsz <= d_symbuflen);
                 unsigned char *start = (unsigned char *)memmem(&d_symbuf[d_symbuflen - searchsz], searchsz, trigger_data, trigger_len);
                 if(start != NULL) {
-                    XXXnext = 1;
                     busy_idle_bit = 0;
                     message_port_pub(pmt::mp("bursts"), pmt::mp("yoyo 123"));
                     printf("XXX YO GOT IT @%lu  start %p  d_symbuf %p  noutput_items %d  trigger_len %lu  searchsz %lu\n", XXXbitcount, start, d_symbuf, noutput_items, trigger_len, searchsz);
