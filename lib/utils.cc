@@ -13,6 +13,48 @@ using std::string;
 
 namespace gr {
     namespace amps {
+
+        /**
+         * Decode a Manchester-encoded byte buffer (unsigned char buf of 0x0 
+         * and 0x1 values) into another byte buffer.
+         *
+         * The length specified is the size of the destination buffer.
+         * Returns the number of invalid bits.
+         */
+        size_t
+        manchester_decode_binbuf(const unsigned char *srcbuf, unsigned char *dstbuf, size_t dstbufsz) {
+            const size_t srcbufsz = dstbufsz * 2;
+            size_t badbits = 0;
+            assert(srcbufsz > dstbufsz);
+            size_t o = 0;
+            for(size_t i = 0; i < srcbufsz; i += 2) {
+                const unsigned short sval = ((srcbuf[i] & 0xff) << 8) | (srcbuf[i+1] & 0xff);
+                bool outbit;
+                switch(sval) {
+                    case 0x101:
+                        outbit = 0;
+                        badbits++;
+                        break;
+                    case 0x000:
+                        outbit = 1;
+                        badbits++;
+                        break;
+                    case 0x100:
+                        outbit = 0;
+                        break;
+                    case 0x001:
+                        outbit = 1;
+                        break;
+                    default:
+                        assert(0);
+                        break;
+                }
+                dstbuf[o] = outbit;
+                o++;
+            }
+            return badbits;
+        }
+
         std::vector<char>
         string_to_cvec(std::string binstr) {
             std::vector<char> outvec;

@@ -66,7 +66,8 @@ namespace gr {
 
         recc_impl::recc_impl()
           : d_symbufsz(65536), d_symbuflen(0),
-          d_windowsz(4096), d_curstart(NULL), capture_len(1000),
+          d_windowsz(4096), d_curstart(NULL), 
+          capture_len(3374),    // figure 2.7.1-1; (DCC (7 bits) + up to 7 words of 240 bits each) * 2 syms/bit = 3374 symbols
           sync_block("recc",
                   io_signature::make(1, 1, sizeof (unsigned char)),
                   io_signature::make(0, 0, 0))
@@ -122,7 +123,7 @@ namespace gr {
                     busy_idle_bit = 0;
                     ptrdiff_t capturedsyms = d_symbuflen - startoff - trigger_len;
                     if(capturedsyms > capture_len) {
-                        message_port_pub(pmt::mp("bursts"), pmt::mp("yoyo 123"));
+                        message_port_pub(pmt::mp("bursts"), pmt::mp(&d_curstart[trigger_len], capture_len));
                         printf("XXX YO GOT IT off %tu  d_symbuflen %zu  capturedsyms %tu  trigger_len %zu   bit @%lu  d_symbuf %p  noutput_items %d  trigger_len %lu  searchsz %lu\n", startoff, d_symbuflen, capturedsyms, trigger_len, XXXbitcount, d_symbuf, noutput_items, trigger_len, searchsz);
                         ptrdiff_t tomove = d_symbuflen - (capturedsyms + trigger_len);
                         assert(tomove >= 0);

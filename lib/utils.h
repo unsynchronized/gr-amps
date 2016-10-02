@@ -19,6 +19,7 @@ namespace gr {
     namespace amps {
         void charv_to_bvec(std::vector<char> &sv, bvec &bv);
         std::vector<char> string_to_cvec(std::string binstr);
+        size_t manchester_decode_binbuf(const unsigned char *srcbuf, unsigned char *dstbuf, size_t dstbufsz);
     }
 }
 

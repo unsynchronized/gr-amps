@@ -8,7 +8,10 @@
 #ifndef INCLUDED_AMPS_RECC_DECODE_IMPL_H
 #define INCLUDED_AMPS_RECC_DECODE_IMPL_H
 
+#include <itpp/comm/bch.h>
 #include <amps/recc_decode.h>
+
+using namespace itpp;
 
 namespace gr {
   namespace amps {
@@ -16,7 +19,9 @@ namespace gr {
     class recc_decode_impl : public recc_decode
     {
      private:
-      // Nothing to declare in this block.
+         itpp::BCH bch;
+
+         bool recc_bch_decode(const unsigned char *srcbuf, unsigned char *dstbuf);
 
      public:
       recc_decode_impl();
