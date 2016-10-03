@@ -83,6 +83,58 @@ namespace gr {
           }
       };
 
+      class recc_word {
+          public:
+          bool F;               // First - 1 when it's the first word in a message
+          unsigned char NAWC;   // Number of Additional Words Coming
+
+          recc_word(unsigned char *bytebuf) {
+              F = ((bytebuf[0] & 1) == 1);
+              NAWC = ((bytebuf[1] & 1) << 2)
+                  | ((bytebuf[2] & 1) << 1)
+                  | ((bytebuf[3] & 1) << 1);
+          }
+      };
+
+#define BIT(x) ((x) & 0x1)
+
+      inline unsigned char get8(const unsigned char *buf, size_t bits) {
+          unsigned char val = 0;
+          for(int i = 0; bits > 0; i++, bits--) {
+              val <<= 1;
+              val |= (buf[i] & 1);
+          }
+          return val;
+      }
+
+      inline u_int64_t get64(const unsigned char *buf, size_t bits) {
+          u_int64_t val = 0;
+          for(int i = 0; bits > 0; i++, bits--) {
+              val <<= 1;
+              val |= (buf[i] & 1);
+          }
+          return val;
+      }
+
+      class recc_word_a : public recc_word {
+          public:
+          bool T;             // when 1, message is an origination or an order; when 0, msg is a response
+          bool S;             // when 1, the serial number is sent
+          bool E;             // when 1, the extended address word (B) is sent
+          bool ER;            // Extended Protocol Reverse Channel
+          unsigned char SCM;  // station class mark
+          u_int64_t MIN1;     // first part of the MIN (bits 23-0);
+
+          recc_word_a(unsigned char *bytebuf) : recc_word(bytebuf) {
+              T = BIT(bytebuf[4]);
+              S = BIT(bytebuf[5]);
+              E = BIT(bytebuf[6]);
+              ER = BIT(bytebuf[7]);
+              SCM = get8(&bytebuf[8], 4);
+              MIN1 = get64(&bytebuf[12], 24);
+          }
+      };
+
   }
 }
 

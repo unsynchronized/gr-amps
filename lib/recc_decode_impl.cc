@@ -12,6 +12,7 @@
 #include <gnuradio/io_signature.h>
 #include "recc_decode_impl.h"
 #include "utils.h"
+#include "amps_packet.h"
 
 using namespace std;
 
@@ -82,35 +83,29 @@ namespace gr {
                 );
         unsigned char dcc[7];
         size_t dccerrbits = manchester_decode_binbuf(bdata, dcc, sizeof(dcc));
-        printf("XXX DCC: %hhu%hhu%hhu%hhu%hhu%hhu%hhu\n", 
-                dcc[0], dcc[1], dcc[2], dcc[3], dcc[4], dcc[5], dcc[6]);
         // XXX: validate DCC
         unsigned char words[7][240];
         unsigned char decwords[7][48];
         size_t errs[7];
+        bool validwords[7];
         for(int i = 0; i < 7; i++) {
             errs[i] = manchester_decode_binbuf(&bdata[14 + (480 * i)], words[i], 240);
             printf("%d: %zu errs\n", i, errs[i]);
         }
         for(int w = 0; w < 7; w++) {
-            printf("--- word %d\n", w);
             for(int r = 0; r < 5; r++) {
-                printf("%hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu  ", 
-                        words[w][(r * 48) + 0],
-                        words[w][(r * 48) + 1],
-                        words[w][(r * 48) + 2],
-                        words[w][(r * 48) + 3],
-                        words[w][(r * 48) + 4],
-                        words[w][(r * 48) + 5],
-                        words[w][(r * 48) + 6],
-                        words[w][(r * 48) + 7]
-                );
-                bool retval = recc_bch_decode(&words[w][(r * 48)], decwords[w]);
-                if(retval == false) {
-                    cout << "FAILED" << endl;
+                validwords[w] = recc_bch_decode(&words[w][(r * 48)], decwords[w]);
+                if(validwords[w] == true) {
+                    break;
                 }
             }
         }
+        if(validwords[0] == false) {
+            LOG_DEBUG("got a burst with an invalid Word A");
+            return;
+        }
+        recc_word_a worda(words[0]);
+        printf("XXX F %d  NAWC %d  SCM %hhd  MIN1 %llx\n", worda.F, worda.NAWC, worda.SCM, worda.MIN1);
     }
 
     /*
