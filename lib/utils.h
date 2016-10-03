@@ -15,6 +15,8 @@ using std::string;
 using std::vector;
 using std::ostringstream;
 
+#define LOG_DEBUG(VAL) printf(VAL "\n")
+
 namespace gr {
     namespace amps {
         void charv_to_bvec(std::vector<char> &sv, bvec &bv);
