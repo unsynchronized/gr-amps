@@ -61,6 +61,7 @@ namespace gr {
         cout << "decoded: " << decoded << endl;     // XXX
         bvec final = decoded(15, 50);
         cout << "  final: " << final << endl;       // XXX
+        cout << "  errbv: " << errbv << endl;       // XXX
         for(int i = 0; i < 48; i++) {
             if(final[i] == 0) {
                 dstbuf[i] = 0;
@@ -81,12 +82,14 @@ namespace gr {
                 );
         unsigned char dcc[7];
         size_t dccerrbits = manchester_decode_binbuf(bdata, dcc, sizeof(dcc));
+        printf("XXX DCC: %hhu%hhu%hhu%hhu%hhu%hhu%hhu\n", 
+                dcc[0], dcc[1], dcc[2], dcc[3], dcc[4], dcc[5], dcc[6]);
         // XXX: validate DCC
         unsigned char words[7][240];
         unsigned char decwords[7][48];
         size_t errs[7];
         for(int i = 0; i < 7; i++) {
-            errs[i] = manchester_decode_binbuf(&bdata[7 + (480 * i)], words[i], 240);
+            errs[i] = manchester_decode_binbuf(&bdata[14 + (480 * i)], words[i], 240);
             printf("%d: %zu errs\n", i, errs[i]);
         }
         for(int w = 0; w < 7; w++) {
