@@ -7,6 +7,9 @@
 #ifndef AMPS_PACKET_H
 #define AMPS_PACKET_H
 
+#include "utils.h"
+
+
 /*
  * FOCC frames are broken down into bursts; each burst is f broken down 
  * into segments.  Segments are comprised of either busy-idle bits (FOCC_BI_BIT)
@@ -88,7 +91,7 @@ namespace gr {
           bool F;               // First - 1 when it's the first word in a message
           unsigned char NAWC;   // Number of Additional Words Coming
 
-          recc_word(unsigned char *bytebuf) {
+          recc_word(const unsigned char *bytebuf) {
               F = ((bytebuf[0] & 1) == 1);
               NAWC = ((bytebuf[1] & 1) << 2)
                   | ((bytebuf[2] & 1) << 1)
@@ -100,6 +103,15 @@ namespace gr {
 
       inline unsigned char get8(const unsigned char *buf, size_t bits) {
           unsigned char val = 0;
+          for(int i = 0; bits > 0; i++, bits--) {
+              val <<= 1;
+              val |= (buf[i] & 1);
+          }
+          return val;
+      }
+
+      inline unsigned long get32(const unsigned char *buf, size_t bits) {
+          unsigned long val = 0;
           for(int i = 0; bits > 0; i++, bits--) {
               val <<= 1;
               val |= (buf[i] & 1);
@@ -148,7 +160,7 @@ namespace gr {
           unsigned char SDCC2;      // must match the BS's SDCC1/2 values
           u_int64_t MIN2;           // second part of the MIN (bits 33-24)
 
-          recc_word_b(unsigned char *bytebuf) : recc_word(bytebuf) {
+          recc_word_b(const unsigned char *bytebuf) : recc_word(bytebuf) {
               MSG_TYPE = get8(&bytebuf[4], 5);
               ORDQ = get8(&bytebuf[9], 3);
               ORDER = get8(&bytebuf[12], 5);
@@ -159,6 +171,85 @@ namespace gr {
               SDCC1 = get8(&bytebuf[22], 2);
               SDCC2 = get8(&bytebuf[24], 2);
               MIN2 = get64(&bytebuf[26], 10);
+          }
+      };
+      
+      class recc_word_c_serial : public recc_word {
+          public:
+          unsigned long SERIAL;
+
+          recc_word_c_serial(const unsigned char *bytebuf) : recc_word(bytebuf) {
+              SERIAL = get32(&bytebuf[4], 32);
+          }
+      };
+
+      class recc_word_called : public recc_word {
+          public:
+          unsigned long DIGITS;
+
+          recc_word_called(const unsigned char *bytebuf) : recc_word(bytebuf) {
+              DIGITS = get32(&bytebuf[4], 32);
+          }
+
+          std::string digits() {
+              std::string outstr = "";
+              unsigned long digs = DIGITS;
+              bool doneflag = false;
+              for(unsigned int i = 0; i < 8 && doneflag == false; i++) {
+                  unsigned long v = ((digs >> 28) & 0xf);
+                  char c;
+                  switch(v) {
+                      case 13:
+                      case 14:
+                      case 15:
+                          LOG_WARNING("invalid dialed number encoding %lu; truncating", v);
+                          // intentional fallthrough
+                      case 0:
+                          doneflag = true;
+                          break;
+                      case 1:
+                          c = '1';
+                          break;
+                      case 2:
+                          c = '2';
+                          break;
+                      case 3:
+                          c = '3';
+                          break;
+                      case 4:
+                          c = '4';
+                          break;
+                      case 5:
+                          c = '5';
+                          break;
+                      case 6:
+                          c = '6';
+                          break;
+                      case 7:
+                          c = '7';
+                          break;
+                      case 8:
+                          c = '8';
+                          break;
+                      case 9:
+                          c = '9';
+                          break;
+                      case 10:
+                          c = '*';
+                          break;
+                      case 11:
+                          c = '#';
+                          break;
+                      default:
+                          assert(0);
+                          break;
+                  }
+                  if(doneflag == false) {
+                      outstr = outstr + c;
+                      digs <<= 4;
+                  }
+              }
+              return outstr;
           }
       };
 

@@ -105,15 +105,41 @@ namespace gr {
             return;
         }
         recc_word_a worda(words[0]);
-        printf("XXX F %d  NAWC %d  SCM %hhd  MIN1 %llx\n", worda.F, worda.NAWC, worda.SCM, worda.MIN1);
         if(worda.E == false) {
             LOG_WARNING("got a RECC message with E=0; not sure what this is");
             return;
         }
         recc_word_b wordb(words[1]);
         // XXX: verify NAWC
-        string reqmin = calc_min(worda, wordb);
-        printf("FULL MIN: %s\n", reqmin.c_str());
+        
+        if(wordb.ORDER == 0 && wordb.ORDQ == 0 && wordb.MSG_TYPE == 0) {
+            // This is a registration.  Word D will be sent.
+            // XXX: verify NAWC
+            unsigned char nawc = wordb.NAWC;
+            unsigned long esn = 0;
+            unsigned int nextword = 2;
+            if(worda.S == true) {
+                recc_word_c_serial wordc(words[nextword]);
+                nextword++;
+                esn = wordc.SERIAL;
+                nawc = wordc.NAWC;
+            }
+            // XXX: verify NAWC
+            if(nawc < 1 || nawc > 4) {
+                LOG_WARNING("invalid NAWC value in RECC origination: 0x%x", nawc);
+                return;
+            }
+            string dialed = "";
+            for( ; nawc > 0; nawc--) {
+                recc_word_called curword(words[nextword]);
+                nextword++;
+                dialed = dialed + curword.digits();
+            }
+            string reqmin = calc_min(worda, wordb);
+            LOG_DEBUG("origination: MIN=%s ESN=%lx dialed %s", reqmin.c_str(), esn, dialed.c_str());
+        } else {
+            LOG_WARNING("got unknown RECC message: ORDER 0x%hhx  ORDQ 0x%hhx  MSG_TYPE 0x%hhx", wordb.ORDER, wordb.ORDQ, wordb.MSG_TYPE);
+        }
     }
 
     /*
