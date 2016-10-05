@@ -15,7 +15,8 @@ using std::string;
 using std::vector;
 using std::ostringstream;
 
-#define LOG_DEBUG(VAL) printf(VAL "\n")
+#define LOG_WARNING(fmt, ...) printf("%s:%d WARNING: " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__);
+#define LOG_DEBUG(fmt, ...) printf("%s:%d DEBUG: " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__);
 
 namespace gr {
     namespace amps {
