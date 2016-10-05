@@ -106,6 +106,14 @@ namespace gr {
         }
         recc_word_a worda(words[0]);
         printf("XXX F %d  NAWC %d  SCM %hhd  MIN1 %llx\n", worda.F, worda.NAWC, worda.SCM, worda.MIN1);
+        if(worda.E == false) {
+            LOG_WARNING("got a RECC message with E=0; not sure what this is");
+            return;
+        }
+        recc_word_b wordb(words[1]);
+        // XXX: verify NAWC
+        string reqmin = calc_min(worda, wordb);
+        printf("FULL MIN: %s\n", reqmin.c_str());
     }
 
     /*
