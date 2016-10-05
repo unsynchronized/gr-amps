@@ -36,6 +36,7 @@ namespace gr {
            gr_vector_void_star &output_items);
 
       void bursts_message(pmt::pmt_t msg);
+      void handle_origination(std::string min, unsigned long esn, std::string dialed);
     };
 
   } // namespace amps

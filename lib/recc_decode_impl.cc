@@ -137,10 +137,26 @@ namespace gr {
             }
             string reqmin = calc_min(worda, wordb);
             LOG_DEBUG("origination: MIN=%s ESN=%lx dialed %s", reqmin.c_str(), esn, dialed.c_str());
+            handle_origination(reqmin, esn, dialed);
         } else {
             LOG_WARNING("got unknown RECC message: ORDER 0x%hhx  ORDQ 0x%hhx  MSG_TYPE 0x%hhx", wordb.ORDER, wordb.ORDQ, wordb.MSG_TYPE);
         }
     }
+
+    /**
+     * Handle an Origination message.  
+     *
+     * As per 2.6.3.8, after a MS sends this, it'll be waiting for one of the
+     * following messages on the control channel:
+     *
+     *     - Initial Voice Designation Message (a Mobile Station Control 
+     *       Message (3.7.1.1) with a non-11 SCC and a VMAC/CHAN)
+     *     - Directed Retry Message
+     *     - Intercept
+     *     - Reorder
+     */
+    void recc_decode_impl::handle_origination(std::string min, unsigned long esn, std::string dialed) {
+    } 
 
     /*
      * Our virtual destructor.
