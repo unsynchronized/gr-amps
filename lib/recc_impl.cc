@@ -120,7 +120,7 @@ namespace gr {
 
                 if(d_curstart != NULL) {
                     ptrdiff_t startoff = (d_curstart - d_symbuf);
-                    busy_idle_bit = 0;
+                    //busy_idle_bit = 0;
                     ptrdiff_t capturedsyms = d_symbuflen - startoff - trigger_len;
                     if(capturedsyms > capture_len) {
                         message_port_pub(pmt::mp("bursts"), pmt::mp(&d_curstart[trigger_len], capture_len));
