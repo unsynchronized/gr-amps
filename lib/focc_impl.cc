@@ -119,6 +119,11 @@ namespace gr {
             make_superframe();
             validate_superframe();
 
+            message_port_register_in(pmt::mp("focc_words"));
+            set_msg_handler(pmt::mp("focc_words"),
+                boost::bind(&focc_impl::focc_words_message, this, _1)
+            );
+
 #ifdef AMPS_DEBUG
             std::cout << "AMPS_DEBUG is enabled!" << std::endl;
             debugfd = open("/tmp/debug.bits", O_CREAT | O_APPEND, 0755);
@@ -166,7 +171,7 @@ namespace gr {
         }
 
         focc_frame *
-        focc_impl::make_frame(std::vector<char> word_a, std::vector<char> word_b) {
+        focc_impl::make_frame(std::vector<char> word_a, std::vector<char> word_b, bool ephemeral, bool filler) {
             // XXX: remove this
             const unsigned int samples_per_sym = d_symrate / 20000;
             // XXX: memory leak haha
@@ -205,7 +210,7 @@ namespace gr {
                 segments.push_back(new focc_segment(FOCC_END));
             }
 
-            return new focc_frame(segments);
+            return new focc_frame(segments, ephemeral, filler);
         }
 
         void focc_impl::validate_superframe() {
@@ -268,22 +273,22 @@ namespace gr {
             superframe_frames.push_back(make_frame(overhead_word_1(), overhead_word_1()));
             superframe_frames.push_back(make_frame(overhead_word_2(), overhead_word_2()));
             superframe_frames.push_back(make_frame(access_type_parameters_global_action(), access_type_parameters_global_action()));
-            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word()));
-            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word()));
-            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word()));
-            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word()));
-            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word()));
-            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word()));
-            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word()));
-            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word()));
-            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word()));
-            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word()));
-            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word()));
-            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word()));
-            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word()));
-            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word()));
-            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word()));
-            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word()));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
 
             cur_off = 0;
             cur_seg_idx = -1;   // XXX: hack because next_burst_state increments
@@ -299,7 +304,7 @@ namespace gr {
         }
 
         /* This method has been called when all the samples in the current 
-         * burst segment.  It will update cur_burst_state, cur_off, and the 
+         * burst segment have been sent.  It will update cur_burst_state, cur_off, and the 
          * relevant pointers within the current superframe.
          */
         void focc_impl::next_burst_state() {
@@ -313,7 +318,16 @@ namespace gr {
                 if(cur_frame_idx == superframe_frames.size()) {
                     cur_frame_idx = 0;
                 }
+                if(cur_frame->is_ephemeral) {
+                    delete cur_frame;
+                }
                 cur_frame = superframe_frames[cur_frame_idx];
+                if(cur_frame->is_filler) {
+                    focc_frame *nframe = pop_frame_queue();
+                    if(nframe != NULL) {
+                        cur_frame = nframe;
+                    }
+                }
                 cur_seg_idx = 0;
             }
             focc_segment *seg = cur_frame->segments[cur_seg_idx];
@@ -326,6 +340,67 @@ namespace gr {
                 cur_seg_data = NULL;
             }
             cur_off = 0;
+        }
+
+        void 
+        focc_impl::focc_words_message(pmt::pmt_t msg) {
+            assert(msg.is_tuple());
+            size_t len = length(msg);
+            assert(len > 2);
+            long stream = to_long(tuple_ref(msg, 0));
+            long nwords = to_long(tuple_ref(msg, 1));
+            assert(nwords == len-2);
+            for(long i = 0; i < nwords; i++) {
+                pmt::pmt_t blob = tuple_ref(msg, 2+i);
+                size_t blen = pmt::blob_length(blob);
+                assert(blen == 28);
+                const char *bdata = static_cast<const char *>(pmt::blob_data(blob));
+                focc_frame *frame = NULL;
+                switch(stream) {
+                    case STREAM_A:
+                        {
+                            std::vector<char> word_a(bdata, bdata+blen);
+                            std::vector<char> word_b = control_filler_word();
+                            frame = make_frame(word_a, word_b, true, false);
+                        }
+                        break;
+                    case STREAM_B:
+                        {
+                            std::vector<char> word_a = control_filler_word();
+                            std::vector<char> word_b(bdata, bdata+blen);
+                            frame = make_frame(word_a, word_b, true, false);
+                        }
+                        break;
+                    case STREAM_BOTH:
+                        {
+                            std::vector<char> word_a(bdata, bdata+blen);
+                            std::vector<char> word_b(bdata, bdata+blen);
+                            frame = make_frame(word_a, word_b, true, false);
+                        }
+                        break;
+                    default:
+                        assert(0);
+                        break;
+                }
+                push_frame_queue(frame);
+            }
+        }
+
+        void 
+        focc_impl::push_frame_queue(focc_frame *frame) {
+            boost::mutex::scoped_lock lock(frame_queue_mutex);
+            frame_queue.push(frame);
+        }
+
+        focc_frame *
+        focc_impl::pop_frame_queue() {
+            boost::mutex::scoped_lock lock(frame_queue_mutex);
+            if(frame_queue.empty() == true) {
+                return NULL;
+            }
+            focc_frame *frame = frame_queue.front();
+            frame_queue.pop();
+            return frame;
         }
 
         int

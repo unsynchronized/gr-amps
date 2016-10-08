@@ -85,5 +85,23 @@ namespace gr {
                 bv[i] = sv[i];
             }
         }
+
+        /**
+         * Using MSB-first order, convert the specified number of bits from 
+         * the given unsigned numeric value into a 1-byte-per-bit array.
+         *
+         * For example, when nbits=3 and val=6, this will set:
+         *     outbuf[0] = 1
+         *     outbuf[1] = 1
+         *     outbuf[2] = 0
+         */
+        void expandbits(unsigned char *outbuf, size_t nbits, u_int64_t val) {
+            assert(nbits <= 64);
+            while(nbits > 0) {
+                nbits--;
+                outbuf[nbits] = ((unsigned char)val & 0x1);
+                val >>= 1;
+            }
+        }
 	}
 }

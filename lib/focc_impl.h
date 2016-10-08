@@ -8,6 +8,7 @@
 #define INCLUDED_AMPS_FOCC_IMPL_H
 
 //#define AMPS_DEBUG
+//
 
 #include <amps/focc.h>
 #include <queue>
@@ -33,8 +34,12 @@ namespace gr {
     class focc_impl : public focc
     {
     private:
-        std::queue<bool> d_bitqueue;   // Queue of symbols to be sent out.
-        unsigned long d_symrate;            // output symbol rate (must be evenly divisible by the baud rate)
+        // Queue of FOCC frames to emit when there's an empty (non-filler) slot
+        std::queue<focc_frame *> frame_queue;
+        boost::mutex frame_queue_mutex;
+
+        std::queue<bool> d_bitqueue;    // Queue of symbols to be sent out.
+        unsigned long d_symrate;        // output symbol rate (must be evenly divisible by the baud rate)
         itpp::BCH bch;
 
         char *BI_zero_buf;        // Entire burst of symbols to send when B/I bit = 0
@@ -67,14 +72,16 @@ namespace gr {
         void make_superframe();
         void validate_superframe();
         std::vector<char> focc_bch(std::vector<char> inbits);
-        focc_frame *make_frame(std::vector<char> word_a, std::vector<char> word_b);
+        focc_frame *make_frame(std::vector<char> word_a, std::vector<char> word_b, bool ephemeral=false, bool filler=false);
         void next_burst_state();
 
     public:
-      focc_impl(unsigned long symrate);
-      ~focc_impl();
+        focc_impl(unsigned long symrate);
+        ~focc_impl();
 
-      // Where all the action really happens
+        void focc_words_message(pmt::pmt_t msg);
+        void push_frame_queue(focc_frame *frame);
+        focc_frame *pop_frame_queue();
         void queue_file();
         void queue_batch();
         void queue(shared_ptr<bvec> bvptr);

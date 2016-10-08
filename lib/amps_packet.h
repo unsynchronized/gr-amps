@@ -9,6 +9,8 @@
 
 #include "utils.h"
 
+#define GLOBAL_DCC_SHORT 0
+#define GLOBAL_SCC 1        // 6000 Hz
 
 /*
  * FOCC frames are broken down into bursts; each burst is f broken down 
@@ -22,6 +24,12 @@ namespace gr {
             FOCC_BI_BIT = 1,
             FOCC_MESSAGE = 2,
             FOCC_END = 3            // End of the current burst.
+      };
+
+      enum focc_streams {
+          STREAM_A = 1,
+          STREAM_B = 2,
+          STREAM_BOTH = 3,
       };
 
       /**
@@ -74,8 +82,13 @@ namespace gr {
       };
       class focc_frame {
           public:
+          bool is_ephemeral;
+          bool is_filler;
           std::vector<focc_segment *> segments;
-          focc_frame(std::vector<focc_segment *> nsegs) : segments(nsegs) { }
+          focc_frame(std::vector<focc_segment *> nsegs) 
+              : segments(nsegs), is_ephemeral(false), is_filler(false) { }
+          focc_frame(std::vector<focc_segment *> nsegs, bool ephemeral, bool filler) 
+              : segments(nsegs), is_ephemeral(ephemeral), is_filler(filler) { }
           ~focc_frame() {
               for(int i = 0; i < segments.size(); i++) {
                   if(segments[i] != NULL) {

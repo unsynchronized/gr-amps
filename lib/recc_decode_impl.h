@@ -10,6 +10,7 @@
 
 #include <itpp/comm/bch.h>
 #include <amps/recc_decode.h>
+#include "amps_packet.h"
 
 using namespace itpp;
 
@@ -36,8 +37,10 @@ namespace gr {
            gr_vector_void_star &output_items);
 
       void bursts_message(pmt::pmt_t msg);
-      void handle_origination(std::string min, unsigned long esn, std::string dialed);
+      void handle_origination(recc_word_a &worda, recc_word_b &wordb, unsigned long esn, std::string dialed);
     };
+    void focc_word1(unsigned char *word, const bool multiword, const unsigned char dcc, const u_int64_t MIN1);
+    void focc_word2_voice_channel(unsigned char *word, const unsigned char scc, const u_int64_t MIN2, const unsigned char vmac, const unsigned short chan);
 
   } // namespace amps
 } // namespace gr

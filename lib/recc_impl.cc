@@ -124,6 +124,7 @@ namespace gr {
                     ptrdiff_t capturedsyms = d_symbuflen - startoff - trigger_len;
                     if(capturedsyms > capture_len) {
                         message_port_pub(pmt::mp("bursts"), pmt::mp(&d_curstart[trigger_len], capture_len));
+                        // XXX XXX XXX: REMOVE LEAK
                         printf("XXX YO GOT IT off %tu  d_symbuflen %zu  capturedsyms %tu  trigger_len %zu   bit @%lu  d_symbuf %p  noutput_items %d  trigger_len %lu  searchsz %lu\n", startoff, d_symbuflen, capturedsyms, trigger_len, XXXbitcount, d_symbuf, noutput_items, trigger_len, searchsz);
                         ptrdiff_t tomove = d_symbuflen - (capturedsyms + trigger_len);
                         assert(tomove >= 0);

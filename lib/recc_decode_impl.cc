@@ -12,9 +12,9 @@
 #include <gnuradio/io_signature.h>
 #include "recc_decode_impl.h"
 #include "utils.h"
-#include "amps_packet.h"
 
 using namespace std;
+using boost::shared_ptr;
 
 namespace gr {
   namespace amps {
@@ -39,6 +39,7 @@ namespace gr {
 	  	set_msg_handler(pmt::mp("bursts"),
 			boost::bind(&recc_decode_impl::bursts_message, this, _1)
 		);
+        message_port_register_out(pmt::mp("focc_words"));
     }
 
     /*
@@ -135,9 +136,7 @@ namespace gr {
                 nextword++;
                 dialed = dialed + curword.digits();
             }
-            string reqmin = calc_min(worda, wordb);
-            LOG_DEBUG("origination: MIN=%s ESN=%lx dialed %s", reqmin.c_str(), esn, dialed.c_str());
-            handle_origination(reqmin, esn, dialed);
+            handle_origination(worda, wordb, esn, dialed);
         } else {
             LOG_WARNING("got unknown RECC message: ORDER 0x%hhx  ORDQ 0x%hhx  MSG_TYPE 0x%hhx", wordb.ORDER, wordb.ORDQ, wordb.MSG_TYPE);
         }
@@ -155,8 +154,62 @@ namespace gr {
      *     - Intercept
      *     - Reorder
      */
-    void recc_decode_impl::handle_origination(std::string min, unsigned long esn, std::string dialed) {
-    } 
+    void recc_decode_impl::handle_origination(recc_word_a &worda, recc_word_b &wordb, unsigned long esn, std::string dialed) {
+        string reqmin = calc_min(worda, wordb);
+        LOG_DEBUG("origination: MIN=%s ESN=%lx dialed %s", reqmin.c_str(), esn, dialed.c_str());
+        long stream;
+        char c = reqmin.back() - '0';
+        if(c & 1) {
+            stream = STREAM_B;
+        } else {
+            stream = STREAM_A;
+        }
+
+        unsigned char word1[28], word2[28];
+        // Initial Voice Designation: Word 1 + Word 2 with SCC != 11
+        const unsigned char vmac = 0;
+        const unsigned short chan = 400;    // XXX: 400 is fwd 882.000 rev 837.000
+
+        focc_word1(word1, true, GLOBAL_DCC_SHORT, worda.MIN1);
+        focc_word2_voice_channel(word2, GLOBAL_SCC, wordb.MIN2, vmac, chan);
+
+        pmt::pmt_t tuple = pmt::make_tuple(pmt::from_long(stream), pmt::from_long(2), pmt::mp(word1, 28), pmt::mp(word2, 28));
+        message_port_pub(pmt::mp("focc_words"), tuple);
+    }
+
+    /**
+     * Generate a 28-bit (1 byte/bit) array of the Mobile Station Control 
+     * Message Word 1 (Abbreviated Address Word).  Output in word.
+     *
+     * If multiword is true, then this is the first word of many in a message;
+     * if false, Word 1 is the only word in the message.
+     */
+    void focc_word1(unsigned char *word, const bool multiword, const unsigned char dcc, const u_int64_t MIN1) {
+        word[0] = 0;
+        word[1] = multiword ? 1 : 0;
+        word[2] = ((dcc & 0x2) == 0x2) ? 1 : 0;
+        word[3] = ((dcc & 0x1) == 0x1) ? 1 : 0;
+        expandbits(&word[4], 24, MIN1);
+    }
+
+    /**
+     * Generate a 28-bit (1 byte/bit) array of the Mobile Station Control 
+     * Message Word 2 (VMAC/CHAN variant).
+     */
+    void focc_word2_voice_channel(unsigned char *word, const unsigned char scc, const u_int64_t MIN2, const unsigned char vmac, const unsigned short chan) {
+        word[0] = 1;
+        word[1] = 0;
+        word[2] = ((scc & 0x2) == 0x2) ? 1 : 0;
+        word[3] = ((scc & 0x1) == 0x1) ? 1 : 0;
+
+        expandbits(&word[4], 10, MIN2);
+
+        word[14] = ((vmac & 0x4) == 0x4) ? 1 : 0;
+        word[15] = ((vmac & 0x2) == 0x2) ? 1 : 0;
+        word[16] = ((vmac & 0x1) == 0x1) ? 1 : 0;
+
+        expandbits(&word[17], 11, chan);
+    }
 
     /*
      * Our virtual destructor.
