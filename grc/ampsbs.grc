@@ -336,6 +336,53 @@
       <key>id</key>
       <value>amps_recc_0</value>
     </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+  </block>
+  <block>
+    <key>amps_recc_decode</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(776, 232)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>amps_recc_decode_0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
   </block>
   <block>
     <key>analog_frequency_modulator_fc</key>
@@ -2994,6 +3041,18 @@
     <sink_block_id>blocks_char_to_float_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>amps_recc_0</source_block_id>
+    <sink_block_id>amps_recc_decode_0</sink_block_id>
+    <source_key>bursts</source_key>
+    <sink_key>bursts</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>amps_recc_decode_0</source_block_id>
+    <sink_block_id>amps_focc_0</sink_block_id>
+    <source_key>focc_words</source_key>
+    <sink_key>focc_words</sink_key>
   </connection>
   <connection>
     <source_block_id>analog_frequency_modulator_fc_0</source_block_id>

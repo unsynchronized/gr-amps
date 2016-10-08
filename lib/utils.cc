@@ -99,7 +99,7 @@ namespace gr {
             assert(nbits <= 64);
             while(nbits > 0) {
                 nbits--;
-                outbuf[nbits] = ((unsigned char)val & 0x1);
+                outbuf[nbits] = ((val & 0x1) == 0x1) ? 1 : 0;
                 val >>= 1;
             }
         }

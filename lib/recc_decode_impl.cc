@@ -165,13 +165,19 @@ namespace gr {
             stream = STREAM_A;
         }
 
+        stream = STREAM_BOTH;       // XXX XXX
+
         unsigned char word1[28], word2[28];
         // Initial Voice Designation: Word 1 + Word 2 with SCC != 11
         const unsigned char vmac = 0;
         const unsigned short chan = 400;    // XXX: 400 is fwd 882.000 rev 837.000
 
         focc_word1(word1, true, GLOBAL_DCC_SHORT, worda.MIN1);
-        focc_word2_voice_channel(word2, GLOBAL_SCC, wordb.MIN2, vmac, chan);
+        if(dialed[0] == '6') {      // XXX XXX 
+            focc_word2_voice_channel(word2, GLOBAL_SCC, wordb.MIN2, vmac, chan);
+        } else {
+            focc_word2_general(word2, wordb.MIN2, 0, 0, 9);
+        }
 
         pmt::pmt_t tuple = pmt::make_tuple(pmt::from_long(stream), pmt::from_long(2), pmt::mp(word1, 28), pmt::mp(word2, 28));
         message_port_pub(pmt::mp("focc_words"), tuple);
@@ -190,6 +196,23 @@ namespace gr {
         word[2] = ((dcc & 0x2) == 0x2) ? 1 : 0;
         word[3] = ((dcc & 0x1) == 0x1) ? 1 : 0;
         expandbits(&word[4], 24, MIN1);
+    }
+
+    /**
+     * Generate a 28-bit (1 byte/bit) array of the Mobile Station Control
+     * Message Word 2 (SCC = 11)
+     */
+    void focc_word2_general(unsigned char *word, const u_int64_t MIN2, const unsigned char msg_type, const unsigned char ordq, const unsigned char order) {
+        word[0] = 1;
+        word[1] = 0;
+        word[2] = 1;
+        word[3] = 1;
+
+        expandbits(&word[4], 10, MIN2);
+        word[14] = 0;
+        expandbits(&word[15], 5, msg_type);
+        expandbits(&word[20], 3, ordq);
+        expandbits(&word[23], 5, order);
     }
 
     /**

@@ -41,6 +41,7 @@ namespace gr {
     };
     void focc_word1(unsigned char *word, const bool multiword, const unsigned char dcc, const u_int64_t MIN1);
     void focc_word2_voice_channel(unsigned char *word, const unsigned char scc, const u_int64_t MIN2, const unsigned char vmac, const unsigned short chan);
+    void focc_word2_general(unsigned char *word, const u_int64_t MIN2, const unsigned char msg_type, const unsigned char ordq, const unsigned char order);
 
   } // namespace amps
 } // namespace gr
