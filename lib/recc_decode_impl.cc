@@ -170,7 +170,7 @@ namespace gr {
         unsigned char word1[28], word2[28];
         // Initial Voice Designation: Word 1 + Word 2 with SCC != 11
         const unsigned char vmac = 0;
-        const unsigned short chan = 400;    // XXX: 400 is fwd 882.000 rev 837.000
+        const unsigned short chan = 355;    // XXX: 355: fwd 880.650 rev 835.650
 
         focc_word1(word1, true, GLOBAL_DCC_SHORT, worda.MIN1);
         if(dialed[0] == '6') {      // XXX XXX 
