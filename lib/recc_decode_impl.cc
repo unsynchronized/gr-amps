@@ -113,22 +113,24 @@ namespace gr {
         recc_word_b wordb(words[1]);
         // XXX: verify NAWC
         
-        if(wordb.ORDER == 0 && wordb.ORDQ == 0 && wordb.MSG_TYPE == 0) {
+        if(worda.NAWC > 3 || (wordb.ORDER == 0 && wordb.ORDQ == 0 && wordb.MSG_TYPE == 0)) {
             // This is a registration.  Word D will be sent.
             // XXX: verify NAWC
-            unsigned char nawc = wordb.NAWC;
+            unsigned char nawc = worda.NAWC;
             unsigned long esn = 0;
             unsigned int nextword = 2;
             if(worda.S == true) {
                 recc_word_c_serial wordc(words[nextword]);
                 nextword++;
                 esn = wordc.SERIAL;
-                nawc = wordc.NAWC;
+                nawc = worda.NAWC-2;
+                if(wordc.NAWC != nawc) {
+                    LOG_WARNING("protocol violation!  Word C NAWC does not agree with Word A's -- continuing anyway");
+                }
             }
             // XXX: verify NAWC
             if(nawc < 1 || nawc > 4) {
                 LOG_WARNING("invalid NAWC value in RECC origination: 0x%x", nawc);
-                return;
             }
             string dialed = "";
             for( ; nawc > 0; nawc--) {
