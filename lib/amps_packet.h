@@ -108,7 +108,7 @@ namespace gr {
               F = ((bytebuf[0] & 1) == 1);
               NAWC = ((bytebuf[1] & 1) << 2)
                   | ((bytebuf[2] & 1) << 1)
-                  | ((bytebuf[3] & 1) << 1);
+                  | (bytebuf[3] & 1);
           }
       };
 
