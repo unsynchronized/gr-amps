@@ -11,6 +11,7 @@
 
 #include <gnuradio/io_signature.h>
 #include "command_processor_impl.h"
+#include "amps_packet.h"
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include "utils.h"
@@ -53,7 +54,28 @@ namespace gr {
 
     void command_processor_impl::handle_page(const std::string numstr) {
         std::cout << "XXX paging: *" << numstr << "*" << std::endl;
-        debug_msg("--- paging!\n");
+        if(numstr.length() < 1) {
+            debug_msg("missing MIN in page command\n");
+            return;
+        }
+        debug_msg("paging!\n");
+        unsigned char word1[28], word2[28];
+        u_int64_t min1, min2;
+
+        if(parse_min(numstr, min1, min2) == false) {
+            debug_msg("invalid MIN entered");
+            return;
+        }
+        std::string XXXtestmin = calc_min(min1, min2);
+        LOG_DEBUG("XXX min *%s* *%s*", numstr.c_str(), XXXtestmin.c_str());
+
+        // sending a Page Message: Word 1 + Word 2 with SCC = 11
+        focc_word1(word1, true, GLOBAL_DCC_SHORT, min1);
+        focc_word2_general(word2, min2, 0, 0, 0);
+        long stream = STREAM_BOTH;
+
+        pmt::pmt_t tuple = pmt::make_tuple(pmt::from_long(stream), pmt::from_long(2), pmt::mp(word1, 28), pmt::mp(word2, 28));
+        message_port_pub(pmt::mp("focc_words"), tuple);
     }
 
     void command_processor_impl::commands_message(pmt::pmt_t msg) {
@@ -74,7 +96,7 @@ namespace gr {
             boost::trim(num);
             handle_page(num);
         } else {
-            debug_msg("--- invalid command\n");
+            debug_msg("invalid command\n");
         }
     }
 

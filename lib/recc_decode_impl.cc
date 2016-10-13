@@ -111,9 +111,11 @@ namespace gr {
             return;
         }
         recc_word_b wordb(words[1]);
-        // XXX: verify NAWC
-        
-        if(worda.NAWC > 3 || (wordb.ORDER == 0 && wordb.ORDQ == 0 && wordb.MSG_TYPE == 0)) {
+
+        // XXX: hack!  actually keep state as to whether we're paging or not
+        if(worda.NAWC == 2 && (wordb.ORDER == 0 && wordb.ORDQ == 0 && wordb.MSG_TYPE == 0)) {
+            LOG_DEBUG("XXX received page response");
+        } else if(worda.NAWC > 2 || (wordb.ORDER == 0 && wordb.ORDQ == 0 && wordb.MSG_TYPE == 0)) {
             // This is a registration.  Word D will be sent.
             // XXX: verify NAWC
             unsigned char nawc = worda.NAWC;
@@ -131,6 +133,7 @@ namespace gr {
             // XXX: verify NAWC
             if(nawc < 1 || nawc > 4) {
                 LOG_WARNING("invalid NAWC value in RECC origination: 0x%x", nawc);
+                return;
             }
             string dialed = "";
             for( ; nawc > 0; nawc--) {

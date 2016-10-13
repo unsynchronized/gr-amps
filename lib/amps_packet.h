@@ -293,19 +293,69 @@ namespace gr {
           digs = (char)(0x30 + dig) + digs;
           return digs;
       }
+      // Convert three MIN digits (ASCII characters) to a 10-bit binary 
+      // value based on the algorithm in section 2.3.1.1-1.
+      inline u_int64_t compute_min_3(const char d1c, const char d2c, const char d3c) {
+          u_int64_t d1 = d1c-'0';
+          if(d1 == 0) {
+              d1 = 10;
+          }
+          u_int64_t d2 = d2c-'0';
+          if(d2 == 0) {
+              d2 = 10;
+          }
+          u_int64_t d3 = d3c-'0';
+          if(d3 == 0) {
+              d3 = 10;
+          }
+          return (100 * d1 + 10 * d2 + d3 - 111);
+      }
+
+      /**
+       * Given a string of MIN digits, calculate MIN1 and MIN2.
+       * (Ref: 553 2.3.1-1)
+       *
+       * Return true iff the string passed was a valid non-empty MIN; 
+       * false otherwise.
+       */
+      inline bool parse_min(const std::string min, u_int64_t &min1, u_int64_t &min2) {
+          size_t len = min.length();
+          if(len < 1 || len > 10) {
+              return false;
+          }
+          for(size_t i = 0; i < len; i++) {
+              if(min[i] < '0' || min[i] > '9') {
+                  return false;
+              }
+          }
+          min2 = compute_min_3(min[0], min[1], min[2]);
+          u_int64_t om1 = 0;
+          om1 |= ((compute_min_3(min[3], min[4], min[5]) & 0x3ff) << 14);
+          u_int64_t thous = (min[6] - '0');
+          if(thous == 0) {
+              thous = 10;
+          }
+          om1 |= ((thous & 0xf) << 10);
+          om1 |= (compute_min_3(min[7], min[8], min[9]) & 0x3ff);
+          min1 = om1;
+          return true;
+      }
 
       /**
        * Given a RECC Word A (MIN1) and Word B (MIN2), calculate the MIN.
        */
-      inline std::string calc_min(const recc_word_a &wa, const recc_word_b &wb) {
-          std::string npa = extract_min_3(wb.MIN2);
-          std::string exchange = extract_min_3((wa.MIN1 >> 14) & 0x3ff);
-          std::string last_three = extract_min_3(wa.MIN1 & 0x3ff);
-          u_int64_t thous = (wa.MIN1 >> 10) & 0xf;
+      inline std::string calc_min(const u_int64_t MIN1, const u_int64_t MIN2) {
+          std::string npa = extract_min_3(MIN2);
+          std::string exchange = extract_min_3((MIN1 >> 14) & 0x3ff);
+          std::string last_three = extract_min_3(MIN1 & 0x3ff);
+          u_int64_t thous = (MIN1 >> 10) & 0xf;
           if(thous > 9) {
               thous = 0;
           }
           return npa + exchange + (char)(0x30 + thous) + last_three;
+      }
+      inline std::string calc_min(const recc_word_a &wa, const recc_word_b &wb) {
+          return calc_min(wa.MIN1, wb.MIN2);
       }
       void focc_word1(unsigned char *word, const bool multiword, const unsigned char dcc, const u_int64_t MIN1);
       void focc_word2_voice_channel(unsigned char *word, const unsigned char scc, const u_int64_t MIN2, const unsigned char vmac, const unsigned short chan);
