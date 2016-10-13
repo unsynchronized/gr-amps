@@ -61,14 +61,7 @@ namespace gr {
 
         inline void queuebit(bool bit);
         inline unsigned long queuesize() { return d_bitqueue.size(); }
-        void calc_pagerid(const unsigned int code, unsigned int &word1, unsigned int &word2, unsigned int &preamble_idx);
-        void queue_comma(unsigned int nbits, bool startingpolarity);
-        void queue_preamble(unsigned int num);
-        void queue_startcode();
         void queue_dup(bvec &bv);
-        void queue_dup_rev(bvec &bv);
-        void queue_address(unsigned int word1, unsigned int word2);
-        void queue_message(bool continuebit);
         void make_superframe();
         void validate_superframe();
         std::vector<char> focc_bch(std::vector<char> inbits);
@@ -83,7 +76,6 @@ namespace gr {
         void push_frame_queue(focc_frame *frame);
         focc_frame *pop_frame_queue();
         void queue_file();
-        void queue_batch();
         void queue(shared_ptr<bvec> bvptr);
         void queue(gr_uint32 val);
         int work(int noutput_items,

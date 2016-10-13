@@ -30,6 +30,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND amps_sources
     focc_impl.cc
+    fvc_impl.cc
     utils.cc
     recc_impl.cc
     amps_packet.cc
