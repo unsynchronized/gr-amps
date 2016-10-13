@@ -112,9 +112,8 @@ namespace gr {
         }
         recc_word_b wordb(words[1]);
 
-        // XXX: hack!  actually keep state as to whether we're paging or not
-        if(worda.NAWC == 2 && (wordb.ORDER == 0 && wordb.ORDQ == 0 && wordb.MSG_TYPE == 0)) {
-            LOG_DEBUG("XXX received page response");
+        if(worda.T == 0 && (wordb.ORDER == 0 && wordb.ORDQ == 0 && wordb.MSG_TYPE == 0)) {
+            handle_response(worda, wordb);
         } else if(worda.NAWC > 2 || (wordb.ORDER == 0 && wordb.ORDQ == 0 && wordb.MSG_TYPE == 0)) {
             // This is a registration.  Word D will be sent.
             // XXX: verify NAWC
@@ -145,6 +144,24 @@ namespace gr {
         } else {
             LOG_WARNING("got unknown RECC message: ORDER 0x%hhx  ORDQ 0x%hhx  MSG_TYPE 0x%hhx", wordb.ORDER, wordb.ORDQ, wordb.MSG_TYPE);
         }
+    }
+
+    /**
+     * Handle a T=0 RECC message (order response or page response).
+     */
+    void recc_decode_impl::handle_response(const recc_word_a &worda, const recc_word_b &wordb) {
+        string reqmin = calc_min(worda, wordb);
+        LOG_DEBUG("got a response from MIN=%s", reqmin.c_str());
+        long stream = STREAM_BOTH;
+        unsigned char word1[28], word2[28];
+        focc_word1(word1, true, GLOBAL_DCC_SHORT, worda.MIN1);
+        const unsigned char vmac = 0;
+        const unsigned short chan = 355;    // XXX: 355: fwd 880.650 rev 835.650
+
+        focc_word1(word1, true, GLOBAL_DCC_SHORT, worda.MIN1);
+        focc_word2_voice_channel(word2, GLOBAL_SCC, wordb.MIN2, vmac, chan);
+        pmt::pmt_t tuple = pmt::make_tuple(pmt::from_long(stream), pmt::from_long(2), pmt::mp(word1, 28), pmt::mp(word2, 28));
+        message_port_pub(pmt::mp("focc_words"), tuple);
     }
 
     /**
