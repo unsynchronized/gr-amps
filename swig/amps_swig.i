@@ -11,6 +11,7 @@
 #include "amps/focc.h"
 #include "amps/recc.h"
 #include "amps/recc_decode.h"
+#include "amps/command_processor.h"
 %}
 
 
@@ -20,3 +21,5 @@ GR_SWIG_BLOCK_MAGIC2(amps, focc);
 GR_SWIG_BLOCK_MAGIC2(amps, recc);
 %include "amps/recc_decode.h"
 GR_SWIG_BLOCK_MAGIC2(amps, recc_decode);
+%include "amps/command_processor.h"
+GR_SWIG_BLOCK_MAGIC2(amps, command_processor);

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<block>
+    <name>AMPS Command Processor</name>
+    <key>amps_command_processor</key>
+    <category>AMPS</category>
+    <import>import amps</import>
+    <make>amps.command_processor()</make>
+
+    <sink>
+        <name>commands</name>
+        <type>message</type>
+        <optional>1</optional>
+    </sink>
+
+    <source>
+        <name>focc_words</name>
+        <type>message</type>
+        <optional>1</optional>
+    </source>
+
+    <source>
+        <name>debug_output</name>
+        <type>message</type>
+        <optional>1</optional>
+    </source>
+
+</block>

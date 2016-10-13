@@ -32,6 +32,7 @@ list(APPEND amps_sources
     focc_impl.cc
     utils.cc
     recc_impl.cc
+    command_processor_impl.cc
     recc_decode_impl.cc
 )
 
