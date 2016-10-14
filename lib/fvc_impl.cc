@@ -154,7 +154,7 @@ namespace gr {
             unsigned char *out = (unsigned char *) output_items[0];
 
             if(d_curdata.empty()) {
-                return 0;
+                return noutput_items;
             }
             if(d_curqueue.empty()) {
                 d_curqueue = (const std::queue<bool> &)d_curdata;

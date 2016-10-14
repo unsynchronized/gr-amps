@@ -206,6 +206,10 @@ namespace gr {
 
         pmt::pmt_t tuple = pmt::make_tuple(pmt::from_long(stream), pmt::from_long(2), pmt::mp(word1, 28), pmt::mp(word2, 28));
         message_port_pub(pmt::mp("focc_words"), tuple);
+
+        // XXX: unmute the audio
+        message_port_pub(pmt::mp("fvc_mute"), pmt::from_bool(true));
+        message_port_pub(pmt::mp("audio_mute"), pmt::from_bool(false));
     }
 
     /*
