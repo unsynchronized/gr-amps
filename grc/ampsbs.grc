@@ -4246,6 +4246,12 @@
   </connection>
   <connection>
     <source_block_id>amps_fvc_0</source_block_id>
+    <sink_block_id>amps_command_processor_0</sink_block_id>
+    <source_key>debug_out</source_key>
+    <sink_key>commands</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>amps_fvc_0</source_block_id>
     <sink_block_id>blocks_char_to_float_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>

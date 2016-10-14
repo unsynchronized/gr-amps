@@ -97,9 +97,11 @@ namespace gr {
         if(boost::starts_with(cmdstr, "fvc off")) {
             message_port_pub(pmt::mp("fvc_mute"), pmt::from_bool(true));
             message_port_pub(pmt::mp("audio_mute"), pmt::from_bool(false));
+            debug_msg("turning FVC data OFF; audio ON\n");
         } else if(boost::starts_with(cmdstr, "fvc on")) {
             message_port_pub(pmt::mp("fvc_mute"), pmt::from_bool(false));
             message_port_pub(pmt::mp("audio_mute"), pmt::from_bool(true));
+            debug_msg("turning FVC data ON; audio OFF\n");
         } else if(boost::starts_with(cmdstr, "fvc alert")) {
             unsigned char word1[28];
             fvc_word1_general(word1, GLOBAL_SCC, 0, 0, 1);

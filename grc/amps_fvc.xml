@@ -18,6 +18,12 @@
     </sink>
 
     <source>
+        <name>debug_out</name>
+        <type>message</type>
+        <optional>1</optional>
+    </source>
+
+    <source>
         <name>out</name>
         <type>byte</type>
         <vlen>1</vlen>          <!-- XXX XXX XXX XXX XXX XXX XXX: WHY? REMOVE -->

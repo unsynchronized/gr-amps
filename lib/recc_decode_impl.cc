@@ -172,7 +172,7 @@ namespace gr {
         // On the FVC, start sending an alert message.
         unsigned char fvc_word1[28];
         fvc_word1_general(fvc_word1, GLOBAL_SCC, 0, 0, 1);
-        pmt::pmt_t fvc_tuple = pmt::make_tuple(pmt::from_long(1), pmt::mp(fvc_word1, 28));
+        pmt::pmt_t fvc_tuple = pmt::make_tuple(pmt::from_long(1), pmt::mp(fvc_word1, 28), pmt::from_uint64(35));
         message_port_pub(pmt::mp("fvc_words"), fvc_tuple);
 
         // Disable audio and put the FVC in.

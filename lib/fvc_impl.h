@@ -36,6 +36,8 @@ namespace gr {
         std::queue<bool> d_curdata;     // current words
         itpp::BCH bch;
 
+        uint64_t timerhack;             // XXX HACK: When >0, after this many message blocks have been sent, sent "fvc off" to debug_out
+
         const unsigned int samples_per_sym;
 
         inline void queuebit(bool bit);

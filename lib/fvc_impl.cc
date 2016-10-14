@@ -54,7 +54,7 @@ namespace gr {
 
 
         fvc_impl::fvc_impl(unsigned long symrate)
-          : d_symrate(symrate), bch(63, 2, true), samples_per_sym(symrate / 20000),
+          : timerhack(0), d_symrate(symrate), bch(63, 2, true), samples_per_sym(symrate / 20000),
           sync_block("fvc",
                   io_signature::make(0, 0, 0),
                   io_signature::make(1, 1, sizeof (unsigned char)))
@@ -63,6 +63,7 @@ namespace gr {
             set_msg_handler(pmt::mp("fvc_words"),
                 boost::bind(&fvc_impl::fvc_words_message, this, _1)
             );
+            message_port_register_out(pmt::mp("debug_out"));
         }
 
         // Insert bits into the queue.  Here is also where we repeat a single bit
@@ -111,7 +112,6 @@ namespace gr {
             size_t len = length(msg);
             assert(len > 1);
             long nwords = to_long(tuple_ref(msg, 0));
-            assert(nwords == len-1);
             vector<vector<char> > words;
             for(long i = 0; i < nwords; i++) {
                 pmt::pmt_t blob = tuple_ref(msg, 1+i);
@@ -120,6 +120,10 @@ namespace gr {
                 const char *bdata = static_cast<const char *>(pmt::blob_data(blob));
                 vector<char> word(bdata, bdata+blen);
                 words.push_back(word);
+            }
+            if(len > (1+nwords)) {
+                timerhack = to_uint64(tuple_ref(msg, 1+nwords));
+                printf("XXX: setting timerhack to %lld\n", timerhack);
             }
             bvec bigdot("1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1");
             bvec smalldot("1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1");
@@ -156,6 +160,15 @@ namespace gr {
                 return noutput_items;
             }
             if(d_curqueue.empty()) {
+                if(timerhack >= 1) {
+                    timerhack--;
+                    if(timerhack == 0) {
+                        printf("XXX FVC LIMIT HIT\n");
+                        const char *msg = "fvc off";
+                        pmt::pmt_t pdu = pmt::cons(pmt::make_dict(), pmt::init_u8vector(strlen(msg), (const uint8_t *)msg));
+                        message_port_pub(pmt::mp("debug_out"), pdu);
+                    }
+                }
                 d_curqueue = (const std::queue<bool> &)d_curdata;
             }
             const int toxfer = noutput_items < d_curqueue.size() ? noutput_items : d_curqueue.size();
