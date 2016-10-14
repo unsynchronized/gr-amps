@@ -109,13 +109,12 @@ namespace gr {
             printf("XXX: got new FVC words\n");
             assert(msg.is_tuple());
             size_t len = length(msg);
-            assert(len > 2);
-            long stream = to_long(tuple_ref(msg, 0));
-            long nwords = to_long(tuple_ref(msg, 1));
-            assert(nwords == len-2);
+            assert(len > 1);
+            long nwords = to_long(tuple_ref(msg, 0));
+            assert(nwords == len-1);
             vector<vector<char> > words;
             for(long i = 0; i < nwords; i++) {
-                pmt::pmt_t blob = tuple_ref(msg, 2+i);
+                pmt::pmt_t blob = tuple_ref(msg, 1+i);
                 size_t blen = pmt::blob_length(blob);
                 assert(blen == 28);
                 const char *bdata = static_cast<const char *>(pmt::blob_data(blob));

@@ -49,7 +49,34 @@ namespace gr {
     }
 
     /**
-     * Generate a 28-bit (1 byte/bit) array of the Mobile Station Control 
+     * Generate a 28-bit (1 byte/bit) array of the FVC Mobile Station Control
+     * Message Word 1 (MSG_TYPE/ORDQ/ORDER variant).
+     */
+    void fvc_word1_general(unsigned char *word, const unsigned char pscc, const unsigned char msg_type, const unsigned char ordq, const unsigned char order) {
+        word[0] = 1;
+        word[1] = 0;
+        word[2] = 1;
+        word[3] = 1;
+        word[4] = ((pscc & 0x2) == 0x2) ? 1 : 0;
+        word[5] = ((pscc & 0x1) == 0x1) ? 1 : 0;
+        // EF
+        word[6] = 0;
+        // RSVD
+        word[7] = 0;
+        word[8] = 0;
+        word[9] = 0;
+        word[10] = 0;
+        word[11] = 0;
+        word[12] = 0;
+        word[13] = 0;
+        word[14] = 0;
+        expandbits(&word[15], 5, msg_type);
+        expandbits(&word[20], 3, ordq);
+        expandbits(&word[23], 5, order);
+    }
+
+    /**
+     * Generate a 28-bit (1 byte/bit) array of the FOCC Mobile Station Control 
      * Message Word 2 (VMAC/CHAN variant).
      */
     void focc_word2_voice_channel(unsigned char *word, const unsigned char scc, const u_int64_t MIN2, const unsigned char vmac, const unsigned short chan) {

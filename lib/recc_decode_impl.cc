@@ -153,6 +153,9 @@ namespace gr {
      * Handle a T=0 RECC message (order response or page response).
      */
     void recc_decode_impl::handle_response(const recc_word_a &worda, const recc_word_b &wordb) {
+
+        // XXX: at the moment, assume this is a page response
+
         string reqmin = calc_min(worda, wordb);
         LOG_DEBUG("got a response from MIN=%s", reqmin.c_str());
         long stream = STREAM_BOTH;
@@ -165,6 +168,17 @@ namespace gr {
         focc_word2_voice_channel(word2, GLOBAL_SCC, wordb.MIN2, vmac, chan);
         pmt::pmt_t tuple = pmt::make_tuple(pmt::from_long(stream), pmt::from_long(2), pmt::mp(word1, 28), pmt::mp(word2, 28));
         message_port_pub(pmt::mp("focc_words"), tuple);
+
+        // On the FVC, start sending an alert message.
+        unsigned char fvc_word1[28];
+        fvc_word1_general(fvc_word1, GLOBAL_SCC, 0, 0, 1);
+        pmt::pmt_t fvc_tuple = pmt::make_tuple(pmt::from_long(1), pmt::mp(fvc_word1, 28));
+        message_port_pub(pmt::mp("fvc_words"), fvc_tuple);
+
+        // Disable audio and put the FVC in.
+        message_port_pub(pmt::mp("fvc_mute"), pmt::from_bool(false));
+        message_port_pub(pmt::mp("audio_mute"), pmt::from_bool(true));
+
     }
 
     /**

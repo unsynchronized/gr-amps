@@ -132,7 +132,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>20000</value>
+      <value>100000</value>
     </param>
   </block>
   <block>
@@ -206,7 +206,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>10000.0</value>
+      <value>8000.0</value>
     </param>
   </block>
   <block>
@@ -466,7 +466,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(216, 836)</value>
+      <value>(216, 892)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -630,7 +630,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(544, 836)</value>
+      <value>(544, 892)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -741,65 +741,6 @@
     <param>
       <key>id</key>
       <value>analog_nbfm_tx_0</value>
-    </param>
-    <param>
-      <key>max_dev</key>
-      <value>8e3</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>fh</key>
-      <value>-1.0</value>
-    </param>
-    <param>
-      <key>quad_rate</key>
-      <value>16000</value>
-    </param>
-    <param>
-      <key>tau</key>
-      <value>75e-6</value>
-    </param>
-  </block>
-  <block>
-    <key>analog_nbfm_tx</key>
-    <param>
-      <key>audio_rate</key>
-      <value>16000</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(448, 924)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>analog_nbfm_tx_0_0</value>
     </param>
     <param>
       <key>max_dev</key>
@@ -996,69 +937,6 @@
     </param>
   </block>
   <block>
-    <key>analog_sig_source_x</key>
-    <param>
-      <key>amp</key>
-      <value>0.05</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>freq</key>
-      <value>6000</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(168, 940)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>analog_sig_source_x_0_1_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>offset</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>float</value>
-    </param>
-    <param>
-      <key>samp_rate</key>
-      <value>16000</value>
-    </param>
-    <param>
-      <key>waveform</key>
-      <value>analog.GR_COS_WAVE</value>
-    </param>
-  </block>
-  <block>
     <key>blocks_add_xx</key>
     <param>
       <key>alias</key>
@@ -1138,57 +1016,6 @@
     <param>
       <key>id</key>
       <value>blocks_add_xx_0_0</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>float</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>num_inputs</key>
-      <value>2</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_add_xx</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(344, 936)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_add_xx_0_0_0</value>
     </param>
     <param>
       <key>type</key>
@@ -1329,7 +1156,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(400, 836)</value>
+      <value>(400, 892)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1627,7 +1454,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(912, 864)</value>
+      <value>(944, 888)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1674,7 +1501,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(184, 696)</value>
+      <value>(184, 704)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1746,57 +1573,6 @@
     <param>
       <key>id</key>
       <value>blocks_wavfile_source_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>nchan</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>repeat</key>
-      <value>True</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_wavfile_source</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>file</key>
-      <value>/tmp/hacker16k.wav</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(144, 888)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_wavfile_source_0_0</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -2176,7 +1952,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>1</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -2224,69 +2000,6 @@
     </param>
   </block>
   <block>
-    <key>pfb_arb_resampler_xxx</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(704, 944)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>pfb_arb_resampler_xxx_0_1</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>nfilts</key>
-      <value>8</value>
-    </param>
-    <param>
-      <key>rrate</key>
-      <value>samp_rate/16000.0</value>
-    </param>
-    <param>
-      <key>samp_delay</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>atten</key>
-      <value>50</value>
-    </param>
-    <param>
-      <key>taps</key>
-      <value>voice_lpf_taps</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>ccf</value>
-    </param>
-  </block>
-  <block>
     <key>pfb_interpolator_ccf</key>
     <param>
       <key>atten</key>
@@ -2310,7 +2023,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(696, 856)</value>
+      <value>(728, 880)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2338,7 +2051,62 @@
     </param>
     <param>
       <key>taps</key>
-      <value>firdes.low_pass(1, samp_rate, 10000.0, 10000.0)</value>
+      <value>firdes.low_pass(1, samp_rate, 10000.0, 3000.0)</value>
+    </param>
+  </block>
+  <block>
+    <key>pfb_interpolator_ccf</key>
+    <param>
+      <key>atten</key>
+      <value>100</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(544, 104)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>pfb_interpolator_ccf_0_0</value>
+    </param>
+    <param>
+      <key>interp</key>
+      <value>samp_rate/fvc_symrate</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>samp_delay</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>taps</key>
+      <value>firdes.low_pass(1, samp_rate, 10000.0, 5000.0)</value>
     </param>
   </block>
   <block>
@@ -4528,6 +4296,12 @@
     <sink_key>set_mute</sink_key>
   </connection>
   <connection>
+    <source_block_id>amps_command_processor_0</source_block_id>
+    <sink_block_id>amps_fvc_0</sink_block_id>
+    <source_key>fvc_words</source_key>
+    <sink_key>fvc_words</sink_key>
+  </connection>
+  <connection>
     <source_block_id>amps_focc_0</source_block_id>
     <sink_block_id>blocks_char_to_float_0</sink_block_id>
     <source_key>0</source_key>
@@ -4564,8 +4338,20 @@
     <sink_key>set_mute</sink_key>
   </connection>
   <connection>
+    <source_block_id>amps_recc_decode_0</source_block_id>
+    <sink_block_id>amps_fvc_0</sink_block_id>
+    <source_key>fvc_words</source_key>
+    <sink_key>fvc_words</sink_key>
+  </connection>
+  <connection>
     <source_block_id>analog_frequency_modulator_fc_0</source_block_id>
     <sink_block_id>pfb_arb_resampler_xxx_0_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>analog_frequency_modulator_fc_0</source_block_id>
+    <sink_block_id>pfb_interpolator_ccf_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -4588,12 +4374,6 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>analog_nbfm_tx_0_0</source_block_id>
-    <sink_block_id>pfb_arb_resampler_xxx_0_1</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
     <source_block_id>analog_quadrature_demod_cf_0</source_block_id>
     <sink_block_id>digital_clock_recovery_mm_xx_0</sink_block_id>
     <source_key>0</source_key>
@@ -4612,12 +4392,6 @@
     <sink_key>1</sink_key>
   </connection>
   <connection>
-    <source_block_id>analog_sig_source_x_0_1_0</source_block_id>
-    <sink_block_id>blocks_add_xx_0_0_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>1</sink_key>
-  </connection>
-  <connection>
     <source_block_id>blocks_add_xx_0</source_block_id>
     <sink_block_id>blocks_multiply_const_vxx_0</sink_block_id>
     <source_key>0</source_key>
@@ -4626,12 +4400,6 @@
   <connection>
     <source_block_id>blocks_add_xx_0_0</source_block_id>
     <sink_block_id>analog_nbfm_tx_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_add_xx_0_0_0</source_block_id>
-    <sink_block_id>analog_nbfm_tx_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -4690,12 +4458,6 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>blocks_wavfile_source_0_0</source_block_id>
-    <sink_block_id>blocks_add_xx_0_0_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
     <source_block_id>digital_binary_slicer_fb_0_0_0</source_block_id>
     <sink_block_id>amps_recc_0</sink_block_id>
     <source_key>0</source_key>
@@ -4738,14 +4500,14 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>pfb_arb_resampler_xxx_0_1</source_block_id>
+    <source_block_id>pfb_interpolator_ccf_0</source_block_id>
     <sink_block_id>blocks_mute_xx_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>pfb_interpolator_ccf_0</source_block_id>
-    <sink_block_id>blocks_mute_xx_0_0</sink_block_id>
+    <source_block_id>pfb_interpolator_ccf_0_0</source_block_id>
+    <sink_block_id>blocks_add_xx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>

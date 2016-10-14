@@ -100,6 +100,11 @@ namespace gr {
         } else if(boost::starts_with(cmdstr, "fvc on")) {
             message_port_pub(pmt::mp("fvc_mute"), pmt::from_bool(false));
             message_port_pub(pmt::mp("audio_mute"), pmt::from_bool(true));
+        } else if(boost::starts_with(cmdstr, "fvc alert")) {
+            unsigned char word1[28];
+            fvc_word1_general(word1, GLOBAL_SCC, 0, 0, 1);
+            pmt::pmt_t tuple = pmt::make_tuple(pmt::from_long(1), pmt::mp(word1, 28));
+            message_port_pub(pmt::mp("fvc_words"), tuple);
         } else if(boost::istarts_with(cmdstr, "page ")) {
             std::string num(cmdstr.substr(5));
             boost::trim(num);
