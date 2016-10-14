@@ -9,6 +9,7 @@
 #endif
 
 #include <gnuradio/io_signature.h>
+#include "amps_packet.h"
 #include "focc_impl.h"
 #include <iostream>
 #include <sstream>
@@ -248,6 +249,54 @@ namespace gr {
             // NAWC = 0010
             return string_to_cvec("1 1 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 1 0 0 1 0 1 1 0");
         }
+        std::vector<char> overhead_word_1(unsigned char dcc, unsigned short sid, bool ep, bool auth, bool pci, unsigned char nawc) {
+            unsigned char word[28];
+            word[0] = 1;
+            word[1] = 1;
+            word[2] = ((dcc & 0x2) == 0x2) ? 1 : 0;
+            word[3] = ((dcc & 0x1) == 0x1) ? 1 : 0;
+            expandbits(&word[4], 14, (sid >> 1));
+            word[18] = ep ? 1 : 0;
+            word[19] = auth ? 1 : 0;
+            word[20] = pci ? 1 : 0;
+            expandbits(&word[21], 4, nawc);
+            word[25] = 1;
+            word[26] = 1;
+            word[27] = 0;
+
+            std::vector<char> ch(word, word+28);
+            return ch;
+        }
+        std::vector<char> overhead_word_2(unsigned char dcc, bool s, bool e, bool regh, bool regr, unsigned char dtx, unsigned char nminusone, bool rcf, bool cpa, unsigned char cmax, bool end) {
+            unsigned char word[28];
+            word[0] = 1;
+            word[1] = 1;
+            word[2] = ((dcc & 0x2) == 0x2) ? 1 : 0;
+            word[3] = ((dcc & 0x1) == 0x1) ? 1 : 0;
+            word[4] = s ? 1 : 0;
+            word[5] = e ? 1 : 0;
+            word[6] = regh ? 1 : 0;
+            word[7] = regr ? 1 : 0;
+            word[8] = ((dtx & 0x2) == 0x2) ? 1 : 0;
+            word[9] = ((dtx & 0x1) == 0x1) ? 1 : 0;
+            expandbits(&word[10], 5, nminusone);
+            word[15] = rcf ? 1 : 0;
+            word[16] = cpa ? 1 : 0;
+            expandbits(&word[17], 7, cmax);
+            word[24] = end ? 1 : 0;
+            word[25] = 1;
+            word[26] = 1;
+            word[27] = 1;
+            std::vector<char> ch(word, word+28);
+
+            printf("XXX ch: ");
+            for(size_t i = 0; i < ch.size(); i++) {
+                printf("%hhd ", ch[i]);
+            }
+            printf("\n");
+
+            return ch;
+        }
         std::vector<char> overhead_word_2() {
             // END = 1
             //return string_to_cvec("1 1 0 0 1 1 1 1 0 0 1 0 1 0 0 1 1 0 0 1 0 1 0 0 1 1 1 1");
@@ -270,8 +319,11 @@ namespace gr {
         }
         void
         focc_impl::make_superframe() {
-            superframe_frames.push_back(make_frame(overhead_word_1(), overhead_word_1()));
-            superframe_frames.push_back(make_frame(overhead_word_2(), overhead_word_2()));
+            superframe_frames.push_back(make_frame(overhead_word_1(GLOBAL_DCC_SHORT, 16, 1, 0, 1, 2), overhead_word_1(GLOBAL_DCC_SHORT, 16, 1, 0, 1, 2)));
+            superframe_frames.push_back(make_frame(
+                        overhead_word_2(GLOBAL_DCC_SHORT, 1, 1, 1, 1, 0, 20, 1, 1, 20, 0), 
+                        overhead_word_2(GLOBAL_DCC_SHORT, 1, 1, 1, 1, 0, 20, 1, 1, 20, 0)
+                        ));
             superframe_frames.push_back(make_frame(access_type_parameters_global_action(), access_type_parameters_global_action()));
             superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
             superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
