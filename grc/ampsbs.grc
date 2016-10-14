@@ -357,7 +357,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(384, 704)</value>
+      <value>(392, 664)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -678,7 +678,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(528, 844)</value>
+      <value>(448, 916)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -910,7 +910,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(248, 860)</value>
+      <value>(168, 932)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1067,7 +1067,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(424, 856)</value>
+      <value>(344, 928)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1628,7 +1628,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(224, 808)</value>
+      <value>(144, 880)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -4227,6 +4227,12 @@
   </block>
   <connection>
     <source_block_id>amps_command_processor_0</source_block_id>
+    <sink_block_id>blocks_mute_xx_0</sink_block_id>
+    <source_key>audio_mute</source_key>
+    <sink_key>set_mute</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>amps_command_processor_0</source_block_id>
     <sink_block_id>blocks_socket_pdu_0</sink_block_id>
     <source_key>debug_output</source_key>
     <sink_key>pdus</sink_key>
@@ -4236,6 +4242,12 @@
     <sink_block_id>amps_focc_0</sink_block_id>
     <source_key>focc_words</source_key>
     <sink_key>focc_words</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>amps_command_processor_0</source_block_id>
+    <sink_block_id>blocks_mute_xx_0_0</sink_block_id>
+    <source_key>fvc_mute</source_key>
+    <sink_key>set_mute</sink_key>
   </connection>
   <connection>
     <source_block_id>amps_focc_0</source_block_id>

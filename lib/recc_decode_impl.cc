@@ -40,6 +40,9 @@ namespace gr {
 			boost::bind(&recc_decode_impl::bursts_message, this, _1)
 		);
         message_port_register_out(pmt::mp("focc_words"));
+        message_port_register_out(pmt::mp("fvc_words"));
+        message_port_register_out(pmt::mp("audio_mute"));
+        message_port_register_out(pmt::mp("fvc_mute"));
     }
 
     /*

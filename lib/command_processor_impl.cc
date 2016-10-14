@@ -44,6 +44,9 @@ namespace gr {
 		);
         message_port_register_out(pmt::mp("focc_words"));
         message_port_register_out(pmt::mp("debug_output"));
+        message_port_register_out(pmt::mp("fvc_words"));
+        message_port_register_out(pmt::mp("audio_mute"));
+        message_port_register_out(pmt::mp("fvc_mute"));
     }
 
     void command_processor_impl::debug_msg(const char *msg) {
@@ -91,7 +94,13 @@ namespace gr {
             carray[i] = cmdchars[i];
         }
         std::string cmdstr(carray);
-        if(boost::istarts_with(cmdstr, "page ")) {
+        if(boost::starts_with(cmdstr, "fvc off")) {
+            message_port_pub(pmt::mp("fvc_mute"), pmt::from_bool(true));
+            message_port_pub(pmt::mp("audio_mute"), pmt::from_bool(false));
+        } else if(boost::starts_with(cmdstr, "fvc on")) {
+            message_port_pub(pmt::mp("fvc_mute"), pmt::from_bool(false));
+            message_port_pub(pmt::mp("audio_mute"), pmt::from_bool(true));
+        } else if(boost::istarts_with(cmdstr, "page ")) {
             std::string num(cmdstr.substr(5));
             boost::trim(num);
             handle_page(num);
