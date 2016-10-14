@@ -242,6 +242,9 @@ namespace gr {
             const unsigned int totalbits = totalsyms / (samples_per_sym * 2);     // XXX factor this out into the class or something
             assert(totalbits == (superframe_frames.size() * 463));
             std::cerr << "validate: totalsyms " << totalsyms << " totalbits " << totalbits << std::endl;
+            std::cerr << "---" << std::endl;
+            std::cerr << "--- gr-amps --- --- part of the ninjatel family --- written by cstone@pobox.com" << std::endl;
+            std::cerr << "---" << std::endl;
         }
         std::vector<char> overhead_word_1() {
             // NAWC = 0001
