@@ -288,13 +288,6 @@ namespace gr {
             word[26] = 1;
             word[27] = 1;
             std::vector<char> ch(word, word+28);
-
-            printf("XXX ch: ");
-            for(size_t i = 0; i < ch.size(); i++) {
-                printf("%hhd ", ch[i]);
-            }
-            printf("\n");
-
             return ch;
         }
         std::vector<char> overhead_word_2() {
@@ -479,9 +472,7 @@ namespace gr {
                     //printf("XXX s_to_s %d toxfer %d\n", samps_to_send, toxfer); 
                     assert(toxfer > 0);     // XXX: remove
                     assert(cur_off < (samples_per_sym*2));
-                    static bool XXXdoneit = false;
                     if(busy_idle_bit == 0) {
-                        //if(XXXdoneit == false) { XXXdoneit = true; printf("XXX YO DONE IT\n"); }
                         memcpy(&out[optr], &BI_zero_buf[cur_off], toxfer);
                     } else {
                         memcpy(&out[optr], &BI_one_buf[cur_off], toxfer);
