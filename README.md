@@ -50,10 +50,10 @@ Unlike the FOCC, which transmits data continuously, the FVC operates on a blank-
 
 This block takes in PDUs consisting of text-based commands (e.g. from a GR Socket PDU block) and executes them.  Supported commands are:
 
-- fvc off: Disables the data on FVC 355 and enables the audio stream
-- fvc on: Enables the data on FVC 355 and disables the audio stream
-- fvc alert: Change the message on the AMPS FVC block to an alert order word
-- page NPANNNNNNN: Pages the given number
+- `fvc off`: Disables the data on FVC 355 and enables the audio stream
+- `fvc on`: Enables the data on FVC 355 and disables the audio stream
+- `fvc alert`: Change the message on the AMPS FVC block to an alert order word
+- `page NPANNNNNNN`: Pages the given number
 
 # The Flowgraph
 
@@ -65,7 +65,7 @@ ampsbs.grc targets the USRP (it was developed using an N210); but nothing about 
 
 # Credits
 
-This code was written by Brandon Creighton <cstone@pobox.com>.
+This code was written by Brandon Creighton (<cstone@pobox.com>).
 
 ## Shout Outs
 
