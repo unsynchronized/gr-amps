@@ -210,13 +210,13 @@ namespace gr {
         unsigned char word1[28], word2[28];
         // Initial Voice Designation: Word 1 + Word 2 with SCC != 11
         const unsigned char vmac = 0;
-        const unsigned short chan = 355;    // XXX: 355: fwd 880.650 rev 835.650
+        const unsigned short chan = 356;    // XXX: 356: fwd 880.680 rev 835.680
 
         focc_word1(word1, true, GLOBAL_DCC_SHORT, worda.MIN1);
-        if(dialed[0] == '6') {      // XXX XXX 
-            focc_word2_voice_channel(word2, GLOBAL_SCC, wordb.MIN2, vmac, chan);
-        } else {
+        if(dialed[0] == '0') {      // XXX XXX 
             focc_word2_general(word2, wordb.MIN2, 0, 0, 9);
+        } else {
+            focc_word2_voice_channel(word2, GLOBAL_SCC, wordb.MIN2, vmac, chan);
         }
 
         pmt::pmt_t tuple = pmt::make_tuple(pmt::from_long(stream), pmt::from_long(2), pmt::mp(word1, 28), pmt::mp(word2, 28));
