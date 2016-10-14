@@ -196,6 +196,9 @@ namespace gr {
           }
       };
 
+      /** Decode numbers from a "Word of the Called-Address" word, according 
+       * to 553 2.7.1.1.  The digits table is Table 2.7.1-2.
+       */
       class recc_word_called : public recc_word {
           public:
           unsigned long DIGITS;
@@ -248,9 +251,12 @@ namespace gr {
                           c = '9';
                           break;
                       case 10:
-                          c = '*';
+                          c = '0';
                           break;
                       case 11:
+                          c = '*';
+                          break;
+                      case 12:
                           c = '#';
                           break;
                       default:
