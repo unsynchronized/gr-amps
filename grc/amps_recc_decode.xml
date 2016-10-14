@@ -25,6 +25,12 @@
     </source>
 
     <source>
+        <name>command_out</name>
+        <type>message</type>
+        <optional>1</optional>
+    </source>
+
+    <source>
         <name>audio_mute</name>
         <type>message</type>
         <optional>1</optional>

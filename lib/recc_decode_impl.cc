@@ -43,6 +43,7 @@ namespace gr {
         message_port_register_out(pmt::mp("fvc_words"));
         message_port_register_out(pmt::mp("audio_mute"));
         message_port_register_out(pmt::mp("fvc_mute"));
+        message_port_register_out(pmt::mp("command_out"));
     }
 
     /*
@@ -224,6 +225,11 @@ namespace gr {
         // XXX: unmute the audio
         message_port_pub(pmt::mp("fvc_mute"), pmt::from_bool(true));
         message_port_pub(pmt::mp("audio_mute"), pmt::from_bool(false));
+
+        std::string msgstr = "page " + dialed;
+        const char *msg = msgstr.c_str();
+        pmt::pmt_t pdu = pmt::cons(pmt::make_dict(), pmt::init_u8vector(strlen(msg), (const uint8_t *)msg));
+        message_port_pub(pmt::mp("command_out"), pdu);
     }
 
     /*

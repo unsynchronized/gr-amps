@@ -384,7 +384,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(392, 664)</value>
+      <value>(448, 720)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -4247,7 +4247,7 @@
   <connection>
     <source_block_id>amps_fvc_0</source_block_id>
     <sink_block_id>amps_command_processor_0</sink_block_id>
-    <source_key>debug_out</source_key>
+    <source_key>command_out</source_key>
     <sink_key>commands</sink_key>
   </connection>
   <connection>
@@ -4267,6 +4267,12 @@
     <sink_block_id>blocks_mute_xx_0</sink_block_id>
     <source_key>audio_mute</source_key>
     <sink_key>set_mute</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>amps_recc_decode_0</source_block_id>
+    <sink_block_id>amps_command_processor_0</sink_block_id>
+    <source_key>command_out</source_key>
+    <sink_key>commands</sink_key>
   </connection>
   <connection>
     <source_block_id>amps_recc_decode_0</source_block_id>
