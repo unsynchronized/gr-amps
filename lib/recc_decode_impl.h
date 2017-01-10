@@ -39,6 +39,7 @@ namespace gr {
       void bursts_message(pmt::pmt_t msg);
       void handle_origination(recc_word_a &worda, recc_word_b &wordb, unsigned long esn, std::string dialed);
       void handle_response(const recc_word_a &worda, const recc_word_b &wordb);
+      void handle_registration(recc_word_a &worda, recc_word_b &wordb, std::string reqmin, bool has_esn, unsigned long esn);
     };
 
   } // namespace amps

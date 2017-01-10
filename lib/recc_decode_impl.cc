@@ -116,10 +116,28 @@ namespace gr {
         }
         recc_word_b wordb(words[1]);
 
+        // Handle cases.  Most of these are in TIA/EIA-553-A Table 3.7.1-1.
+
         if(worda.T == 0 && (wordb.ORDER == 0 && wordb.ORDQ == 0 && wordb.MSG_TYPE == 0)) {
             handle_response(worda, wordb);
-        } else if(worda.NAWC > 2 || (wordb.ORDER == 0 && wordb.ORDQ == 0 && wordb.MSG_TYPE == 0)) {
-            // This is a registration.  Word D will be sent.
+        } else if(worda.T == 1 && wordb.ORDER == 0xd) {
+            // ORDER == 01101 (0xd) is a word-C-not-included registration order.
+            string reqmin = calc_min(worda, wordb);
+            LOG_DEBUG("got registration from MIN=%s", reqmin.c_str());
+            unsigned long esn = 0;
+            bool hasesn = worda.S;
+            if(worda.S == true && worda.NAWC > 1) {
+                recc_word_c_serial wordc(words[2]);
+                esn = wordc.SERIAL;
+                LOG_DEBUG("registration included S; ESN=%lx", esn);
+                unsigned char nawc = worda.NAWC-2;
+                if(wordc.NAWC != nawc) {
+                    LOG_WARNING("protocol violation!  Word C NAWC does not agree with Word A's -- continuing anyway");
+                }
+            }
+            handle_registration(worda, wordb, reqmin, hasesn, esn);
+        } else if(worda.T == 1 && (worda.NAWC > 2 || (wordb.ORDER == 0 && wordb.ORDQ == 0 && wordb.MSG_TYPE == 0))) {
+            // Assume this is an origination.  Word D will be sent.
             // XXX: verify NAWC
             unsigned char nawc = worda.NAWC;
             unsigned long esn = 0;
@@ -148,6 +166,27 @@ namespace gr {
         } else {
             LOG_WARNING("got unknown RECC message: ORDER 0x%hhx  ORDQ 0x%hhx  MSG_TYPE 0x%hhx", wordb.ORDER, wordb.ORDQ, wordb.MSG_TYPE);
         }
+    }
+
+    /*
+     * Handle a registration order message. Section 2.6.3.9 (Await Registration
+     * Confirmation) tells us that the MS is listening for an Order
+     * Confirmation message.  The text refers us to 3.7.1.1, which doesn't
+     * actually say what an Order Confirmation message is.
+     *
+     * However, 2.6.2.3 (the section on what to do upon receipt of an Order
+     * over the FOCC while the MS is idle) says that this is accomplished
+     * with an Audit order.
+     */
+    void recc_decode_impl::handle_registration(recc_word_a &worda, recc_word_b &wordb, std::string reqmin, bool has_esn, unsigned long esn) {
+        LOG_DEBUG("sending registration order confirmation");
+        unsigned char word1[28], word2[28];
+        focc_word1(word1, true, GLOBAL_DCC_SHORT, worda.MIN1);
+        focc_word2_general(word2, wordb.MIN2, 0, 0, 7);
+        long stream;
+        stream = STREAM_BOTH;       // XXX XXX
+        pmt::pmt_t tuple = pmt::make_tuple(pmt::from_long(stream), pmt::from_long(2), pmt::mp(word1, 28), pmt::mp(word2, 28));
+        message_port_pub(pmt::mp("focc_words"), tuple);
     }
 
     /**
