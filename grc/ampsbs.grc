@@ -442,6 +442,10 @@
       <value>0</value>
     </param>
     <param>
+      <key>aggressive_registration</key>
+      <value>False</value>
+    </param>
+    <param>
       <key>symrate</key>
       <value>symrate</value>
     </param>

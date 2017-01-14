@@ -4,11 +4,16 @@
   <key>amps_focc</key>
   <category>AMPS</category>
   <import>import amps</import>
-  <make>amps.focc($symrate)</make>
+  <make>amps.focc($symrate, $aggressive_registration)</make>
     <param>
         <name>Symbol Rate</name>
         <key>symrate</key>
         <type>real</type>
+    </param>
+    <param>
+        <name>Registration</name>
+        <key>aggressive_registration</key>
+        <type>bool</type>
     </param>
 
     <sink>

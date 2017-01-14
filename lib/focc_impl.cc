@@ -44,8 +44,8 @@ namespace gr {
          */
 
         focc::sptr
-        focc::make(unsigned long symrate) {
-            return gnuradio::get_initial_sptr (new focc_impl(symrate));
+        focc::make(unsigned long symrate, bool aggressive_registration) {
+            return gnuradio::get_initial_sptr (new focc_impl(symrate, aggressive_registration));
         }
 
 
@@ -101,9 +101,9 @@ namespace gr {
 
 
 
-        focc_impl::focc_impl(unsigned long symrate)
+        focc_impl::focc_impl(unsigned long symrate, bool aggressive_registration)
           : d_symrate(symrate), cur_burst_state(FOCC_END), cur_off(0), bch(63, 2, true),
-            samples_per_sym(symrate / 20000),
+            samples_per_sym(symrate / 20000), d_aggressive_registration(aggressive_registration),
           sync_block("focc",
                   io_signature::make(0, 0, 0),
                   io_signature::make(1, 1, sizeof (unsigned char)))
@@ -117,7 +117,11 @@ namespace gr {
                 BI_one_buf[i] = -1;
                 BI_one_buf[samples_per_sym+i] = 1;
             }
-            make_superframe();
+            if(d_aggressive_registration) {
+                make_registration_superframe();
+            } else {
+                make_superframe();
+            }
             validate_superframe();
 
             message_port_register_in(pmt::mp("focc_words"));
@@ -376,9 +380,45 @@ namespace gr {
             return ch;
         }
 
-
         void
         focc_impl::make_superframe() {
+            superframe_frames.push_back(make_frame(overhead_word_1(GLOBAL_DCC_SHORT, GLOBAL_SID, 1, 0, 0, 3), overhead_word_1(GLOBAL_DCC_SHORT, GLOBAL_SID, 1, 0, 0, 3)));
+            superframe_frames.push_back(make_frame(
+                        overhead_word_2(GLOBAL_DCC_SHORT, 1, 1, 1, 1, 0, 23, 1, 1, 23, 0),
+                        overhead_word_2(GLOBAL_DCC_SHORT, 1, 1, 1, 1, 0, 23, 1, 1, 23, 0)
+                        ));
+            superframe_frames.push_back(make_frame(access_type_parameters_global_action(GLOBAL_DCC_SHORT, false), access_type_parameters_global_action(GLOBAL_DCC_SHORT, false)));
+            superframe_frames.push_back(make_frame(registration_id(GLOBAL_DCC_SHORT, 0, true), registration_id(GLOBAL_DCC_SHORT, 0, true)));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            cur_off = 0;
+            cur_seg_idx = -1;   // XXX: hack because next_burst_state increments
+            cur_seg_len = 0;
+            cur_frame_idx = 0;
+            cur_seg_data = NULL;
+            cur_frame = superframe_frames[cur_frame_idx];
+            if(cur_frame == NULL) {
+                std::cout << "XXX cur_frame NULL" << std::endl;
+                exit(1);
+            }
+            next_burst_state();
+        }
+
+        void
+        focc_impl::make_registration_superframe() {
             superframe_frames.push_back(make_frame(overhead_word_1(GLOBAL_DCC_SHORT, GLOBAL_SID, 1, 0, 0, 4), overhead_word_1(GLOBAL_DCC_SHORT, GLOBAL_SID, 1, 0, 0, 4)));
             superframe_frames.push_back(make_frame(
                         overhead_word_2(GLOBAL_DCC_SHORT, 1, 1, 1, 1, 0, 23, 1, 1, 23, 0), 
