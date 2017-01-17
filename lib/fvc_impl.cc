@@ -163,7 +163,7 @@ namespace gr {
                 if(timerhack >= 1) {
                     timerhack--;
                     if(timerhack == 0) {
-                        printf("XXX FVC LIMIT HIT\n");
+                        printf("FVC Hack: Time out\n");
                         const char *msg = "fvc off";
                         pmt::pmt_t pdu = pmt::cons(pmt::make_dict(), pmt::init_u8vector(strlen(msg), (const uint8_t *)msg));
                         message_port_pub(pmt::mp("command_out"), pdu);

@@ -44,8 +44,8 @@ namespace gr {
          */
 
         focc::sptr
-        focc::make(unsigned long symrate) {
-            return gnuradio::get_initial_sptr (new focc_impl(symrate));
+        focc::make(unsigned long symrate, bool aggressive_registration) {
+            return gnuradio::get_initial_sptr (new focc_impl(symrate, aggressive_registration));
         }
 
 
@@ -101,9 +101,9 @@ namespace gr {
 
 
 
-        focc_impl::focc_impl(unsigned long symrate)
+        focc_impl::focc_impl(unsigned long symrate, bool aggressive_registration)
           : d_symrate(symrate), cur_burst_state(FOCC_END), cur_off(0), bch(63, 2, true),
-            samples_per_sym(symrate / 20000),
+            samples_per_sym(symrate / 20000), d_aggressive_registration(aggressive_registration),
           sync_block("focc",
                   io_signature::make(0, 0, 0),
                   io_signature::make(1, 1, sizeof (unsigned char)))
@@ -117,7 +117,11 @@ namespace gr {
                 BI_one_buf[i] = -1;
                 BI_one_buf[samples_per_sym+i] = 1;
             }
-            make_superframe();
+            if(d_aggressive_registration) {
+                make_registration_superframe();
+            } else {
+                make_superframe();
+            }
             validate_superframe();
 
             message_port_register_in(pmt::mp("focc_words"));
@@ -150,7 +154,7 @@ namespace gr {
          * being numeric 0 and 1) to a 40-bit bch-encoded word.
          */
         std::vector<char>
-        focc_impl::focc_bch(std::vector<char> inbits) {
+        focc_impl::focc_bch(const std::vector<char> inbits) {
             std::vector<char> outvec(40);
             bvec zeroes("0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0");
             bvec srcbvec(28);
@@ -172,10 +176,9 @@ namespace gr {
         }
 
         focc_frame *
-        focc_impl::make_frame(std::vector<char> word_a, std::vector<char> word_b, bool ephemeral, bool filler) {
+        focc_impl::make_frame(const std::vector<char> word_a, const std::vector<char> word_b, bool ephemeral, bool filler) {
             // XXX: remove this
             const unsigned int samples_per_sym = d_symrate / 20000;
-            // XXX: memory leak haha
             std::vector<focc_segment *> segments;
             std::vector<char> bch_a = focc_bch(word_a);
             std::vector<char> bch_b = focc_bch(word_b);
@@ -246,12 +249,6 @@ namespace gr {
             std::cerr << "--- gr-amps --- --- part of the ninjatel family --- written by cstone@pobox.com" << std::endl;
             std::cerr << "---" << std::endl;
         }
-        std::vector<char> overhead_word_1() {
-            // NAWC = 0001
-            //return string_to_cvec("1 1 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 1 0 0 0 1 1 1 0");
-            // NAWC = 0010
-            return string_to_cvec("1 1 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 1 0 0 1 0 1 1 0");
-        }
         std::vector<char> overhead_word_1(unsigned char dcc, unsigned short sid, bool ep, bool auth, bool pci, unsigned char nawc) {
             unsigned char word[28];
             word[0] = 1;
@@ -293,34 +290,105 @@ namespace gr {
             std::vector<char> ch(word, word+28);
             return ch;
         }
-        std::vector<char> overhead_word_2() {
-            // END = 1
-            //return string_to_cvec("1 1 0 0 1 1 1 1 0 0 1 0 1 0 0 1 1 0 0 1 0 1 0 0 1 1 1 1");
-
-            // END = 0
-            return string_to_cvec("1 1 0 0 1 1 1 1 0 0 1 0 1 0 0 1 1 0 0 1 0 1 0 0 0 1 1 1");
-        }
         std::vector<char> control_filler_word() {
-            return string_to_cvec("1 1 0 0 0 1 0 1 1 1 0 1 1 0 0 1 1 0 0 1 1 1 1 1 1 0 0 1");
+            return string_to_cvec("1 1 0 0 0 1 0 1 1 1 0 0 0 0 0 1 1 0 0 1 1 1 1 1 1 0 0 1");
         }
-        std::vector<char> access_type_parameters_global_action() {
-            // DCC = 00
-            // BIS = 0
-            // PCI HOME = 1
-            // PCI ROAM = 1
-            // BSPC = 0000
-            // BSCA P = 000
-            // END = 1
-            return string_to_cvec("1 1 0 0 1 0 0 1 0 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0");
+        std::vector<char> access_type_parameters_global_action(unsigned char dcc, const bool end = 0) {
+            unsigned char word[28];
+            word[0] = 1;                                // T1T2 = 11
+            word[1] = 1;
+            word[2] = ((dcc & 0x2) == 0x2) ? 1 : 0;     // DCC
+            word[3] = ((dcc & 0x1) == 0x1) ? 1 : 0;
+            
+            word[4] = 1;                                // ACT = 1001
+            word[5] = 0;
+            word[6] = 0;
+            word[7] = 1;
+
+            word[8] = 0;                                // BIS = 0
+            word[9] = 0;                                // PCI HOME = 0
+            word[10] = 0;                               // PCI ROAM = 0
+
+            word[11] = 0;                               // BSPC = 0000
+            word[12] = 0;
+            word[13] = 0;
+            word[14] = 0;
+
+            word[15] = 0;                               // BSCA P = 000
+            word[16] = 0;
+            word[17] = 0;
+
+            word[18] = 0;                               // RSVD = 000000
+            word[19] = 0;
+            word[20] = 0;
+            word[21] = 0;
+            word[22] = 0;
+            word[23] = 0;
+
+            word[24] = end ? 1 : 0;                     // END
+            word[25] = 1;                               // OHD = 100
+            word[26] = 0;
+            word[27] = 0;
+
+            std::vector<char> ch(word, word+28);
+            return ch;
         }
+        vector<char> registration_increment_global_action(unsigned char dcc, unsigned short regincr, bool end = false) {
+            unsigned char word[28];
+            word[0] = 1;                                // T1T2 = 11
+            word[1] = 1;
+            word[2] = ((dcc & 0x2) == 0x2) ? 1 : 0;     // DCC
+            word[3] = ((dcc & 0x1) == 0x1) ? 1 : 0;
+
+            word[4] = 0;                                // ACT = 0010
+            word[5] = 0;
+            word[6] = 1;
+            word[7] = 0;
+
+            expandbits(&word[8], 12, regincr);          // REGINCR (12)
+
+            word[20] = 0;                               // RSVD = 0000
+            word[21] = 0;
+            word[22] = 0;
+            word[23] = 0;
+
+            word[24] = end ? 1 : 0;                     // END
+            word[25] = 1;                               // OHD = 100
+            word[26] = 0;
+            word[27] = 0;
+
+            vector<char> ch(word, word+28);
+            return ch;
+        }
+
+        // 3.7.1.2.3 Registration ID message
+        vector<char> registration_id(unsigned char dcc, unsigned long regid, bool end = false) {
+            unsigned char word[28];
+            word[0] = 1;                                // T1T2 = 11
+            word[1] = 1;
+            word[2] = ((dcc & 0x2) == 0x2) ? 1 : 0;     // DCC
+            word[3] = ((dcc & 0x1) == 0x1) ? 1 : 0;
+
+            expandbits(&word[4], 20, regid);
+
+            word[24] = end ? 1 : 0;                     // END
+            word[25] = 0;                               // OHD = 000
+            word[26] = 0;
+            word[27] = 0;
+
+            vector<char> ch(word, word+28);
+            return ch;
+        }
+
         void
         focc_impl::make_superframe() {
-            superframe_frames.push_back(make_frame(overhead_word_1(GLOBAL_DCC_SHORT, 16, 1, 0, 1, 2), overhead_word_1(GLOBAL_DCC_SHORT, 16, 1, 0, 1, 2)));
+            superframe_frames.push_back(make_frame(overhead_word_1(GLOBAL_DCC_SHORT, GLOBAL_SID, 1, 0, 0, 3), overhead_word_1(GLOBAL_DCC_SHORT, GLOBAL_SID, 1, 0, 0, 3)));
             superframe_frames.push_back(make_frame(
-                        overhead_word_2(GLOBAL_DCC_SHORT, 1, 1, 1, 1, 0, 20, 1, 1, 20, 0), 
-                        overhead_word_2(GLOBAL_DCC_SHORT, 1, 1, 1, 1, 0, 20, 1, 1, 20, 0)
+                        overhead_word_2(GLOBAL_DCC_SHORT, 1, 1, 1, 1, 0, 23, 1, 1, 23, 0),
+                        overhead_word_2(GLOBAL_DCC_SHORT, 1, 1, 1, 1, 0, 23, 1, 1, 23, 0)
                         ));
-            superframe_frames.push_back(make_frame(access_type_parameters_global_action(), access_type_parameters_global_action()));
+            superframe_frames.push_back(make_frame(access_type_parameters_global_action(GLOBAL_DCC_SHORT, false), access_type_parameters_global_action(GLOBAL_DCC_SHORT, false)));
+            superframe_frames.push_back(make_frame(registration_id(GLOBAL_DCC_SHORT, 0, true), registration_id(GLOBAL_DCC_SHORT, 0, true)));
             superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
             superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
             superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
@@ -336,7 +404,67 @@ namespace gr {
             superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
             superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
             superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            cur_off = 0;
+            cur_seg_idx = -1;   // XXX: hack because next_burst_state increments
+            cur_seg_len = 0;
+            cur_frame_idx = 0;
+            cur_seg_data = NULL;
+            cur_frame = superframe_frames[cur_frame_idx];
+            if(cur_frame == NULL) {
+                std::cout << "XXX cur_frame NULL" << std::endl;
+                exit(1);
+            }
+            next_burst_state();
+        }
+
+        void
+        focc_impl::make_registration_superframe() {
+            superframe_frames.push_back(make_frame(overhead_word_1(GLOBAL_DCC_SHORT, GLOBAL_SID, 1, 0, 0, 4), overhead_word_1(GLOBAL_DCC_SHORT, GLOBAL_SID, 1, 0, 0, 4)));
+            superframe_frames.push_back(make_frame(
+                        overhead_word_2(GLOBAL_DCC_SHORT, 1, 1, 1, 1, 0, 23, 1, 1, 23, 0), 
+                        overhead_word_2(GLOBAL_DCC_SHORT, 1, 1, 1, 1, 0, 23, 1, 1, 23, 0)
+                        ));
+            superframe_frames.push_back(make_frame(access_type_parameters_global_action(GLOBAL_DCC_SHORT, false), access_type_parameters_global_action(GLOBAL_DCC_SHORT, false)));
+            superframe_frames.push_back(make_frame(registration_increment_global_action(GLOBAL_DCC_SHORT, 100, false), registration_increment_global_action(GLOBAL_DCC_SHORT, 100, false)));
+            superframe_frames.push_back(make_frame(registration_id(GLOBAL_DCC_SHORT, 0, true), registration_id(GLOBAL_DCC_SHORT, 0, true)));
             superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+
+            superframe_frames.push_back(make_frame(overhead_word_1(GLOBAL_DCC_SHORT, GLOBAL_SID, 1, 0, 0, 4), overhead_word_1(GLOBAL_DCC_SHORT, GLOBAL_SID, 1, 0, 0, 4)));
+            superframe_frames.push_back(make_frame(
+                        overhead_word_2(GLOBAL_DCC_SHORT, 1, 1, 1, 1, 0, 23, 1, 1, 23, 0), 
+                        overhead_word_2(GLOBAL_DCC_SHORT, 1, 1, 1, 1, 0, 23, 1, 1, 23, 0)
+                        ));
+            superframe_frames.push_back(make_frame(access_type_parameters_global_action(GLOBAL_DCC_SHORT, false), access_type_parameters_global_action(GLOBAL_DCC_SHORT, false)));
+            superframe_frames.push_back(make_frame(registration_increment_global_action(GLOBAL_DCC_SHORT, 100, false), registration_increment_global_action(GLOBAL_DCC_SHORT, 100, false)));
+            superframe_frames.push_back(make_frame(registration_id(GLOBAL_DCC_SHORT, 500, true), registration_id(GLOBAL_DCC_SHORT, 500, true)));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+            superframe_frames.push_back(make_frame(control_filler_word(), control_filler_word(), false, true));
+
 
             cur_off = 0;
             cur_seg_idx = -1;   // XXX: hack because next_burst_state increments

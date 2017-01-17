@@ -78,7 +78,7 @@ namespace gr {
             }
             return outvec;
         }
-        void charv_to_bvec(std::vector<char> &sv, bvec &bv) {
+        void charv_to_bvec(const std::vector<char> &sv, bvec &bv) {
             assert(bv.size() >= sv.size());
             for(int i = 0; i < sv.size(); i++) {
                 assert(sv[i] == 0 || sv[i] == 1);

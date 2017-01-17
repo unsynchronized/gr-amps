@@ -20,7 +20,7 @@ using std::ostringstream;
 
 namespace gr {
     namespace amps {
-        void charv_to_bvec(std::vector<char> &sv, bvec &bv);
+        void charv_to_bvec(const std::vector<char> &sv, bvec &bv);
         std::vector<char> string_to_cvec(std::string binstr);
         size_t manchester_decode_binbuf(const unsigned char *srcbuf, unsigned char *dstbuf, size_t dstbufsz);
         void expandbits(unsigned char *outbuf, size_t nbits, u_int64_t val);

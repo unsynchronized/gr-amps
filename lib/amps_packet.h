@@ -9,6 +9,7 @@
 
 #include "utils.h"
 
+#define GLOBAL_SID 16
 #define GLOBAL_DCC_SHORT 0
 #define GLOBAL_SCC 1        // 6000 Hz
 

@@ -31,7 +31,7 @@ namespace gr {
        * class. amps::focc::make is the public interface for
        * creating new instances.
        */
-      static sptr make(unsigned long symrate);
+      static sptr make(unsigned long symrate, bool aggressive_registration);
     };
 
   } // namespace amps

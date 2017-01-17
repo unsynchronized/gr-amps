@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 
     unsigned long symrate = 200000;
     const unsigned int samples_per_sym = symrate / 20000;
-    focc_impl *ai = new focc_impl(symrate);
+    focc_impl *ai = new focc_impl(symrate, 0);
     vector<const void *> ptr;
     vector<void *> outbuf(1);
     char sampbuf[10240], symbuf[10240];

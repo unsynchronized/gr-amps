@@ -40,6 +40,7 @@ namespace gr {
 
         std::queue<bool> d_bitqueue;    // Queue of symbols to be sent out.
         unsigned long d_symrate;        // output symbol rate (must be evenly divisible by the baud rate)
+        bool d_aggressive_registration; // Enables aggressive registration superframe
         itpp::BCH bch;
 
         char *BI_zero_buf;        // Entire burst of symbols to send when B/I bit = 0
@@ -63,13 +64,14 @@ namespace gr {
         inline unsigned long queuesize() { return d_bitqueue.size(); }
         void queue_dup(bvec &bv);
         void make_superframe();
+        void make_registration_superframe();
         void validate_superframe();
         std::vector<char> focc_bch(std::vector<char> inbits);
         focc_frame *make_frame(std::vector<char> word_a, std::vector<char> word_b, bool ephemeral=false, bool filler=false);
         void next_burst_state();
 
     public:
-        focc_impl(unsigned long symrate);
+        focc_impl(unsigned long symrate, bool aggressive_registration);
         ~focc_impl();
 
         void focc_words_message(pmt::pmt_t msg);
