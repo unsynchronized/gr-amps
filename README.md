@@ -81,7 +81,7 @@ This code is in the public domain. However, be aware that many of its dependenci
 # References
 
 - For another AMPS implementation, see osmocom-analog: https://osmocom.org/projects/osmocom-analog
-- TIA/EIA-553-A (1999)
+- TIA/EIA-553-A (1999)   (http://download.eversberg.eu/mobilfunk/AMPS-Docs/TIA_EIA_553_A.pdf)[http://download.eversberg.eu/mobilfunk/AMPS-Docs/TIA_EIA_553_A.pdf]
 - RSS 118, specifically Annex A (https://www.ic.gc.ca/eic/site/smt-gst.nsf/vwapj/rss118annex.PDF/$FILE/rss118annex.PDF)
 - Brian Oblivion, "Cellular Telephony".  Phrack 38, file 9 (part 1); and Phrack 40, file 6 (part 2).
 - John G. van Bosse & Fabrizio U. Devetak, Signaling in Telecommunication Networks, 2nd ed.
