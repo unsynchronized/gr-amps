@@ -3,6 +3,9 @@
 #endif
 
 #include <itpp/comm/bch.h>
+#include <time.h>
+#include <sys/time.h>
+#include <string.h>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -103,5 +106,30 @@ namespace gr {
                 val >>= 1;
             }
         }
+
+		/* NOTE: NOT THREAD SAFE */
+		const char * getstamp() {
+			static char stampbuf[1024];
+			struct timeval tv;
+			memset(&tv, 0, sizeof(struct timeval));
+			if(gettimeofday(&tv, NULL) == -1) {
+				stampbuf[0] = 0;
+				return stampbuf;
+			}
+			struct tm gtm;
+			memset(&gtm, 0, sizeof(struct tm));
+			if(gmtime_r(&tv.tv_sec, &gtm) == NULL) {
+				stampbuf[0] = 0;
+				return stampbuf;
+			}
+			char strfbuf[256];
+			if(strftime(strfbuf, sizeof(strfbuf), "%F %T", &gtm) == 0) {
+				stampbuf[0] = 0;
+				return stampbuf;
+			}
+			snprintf(stampbuf, sizeof(stampbuf), "%s.%ld", strfbuf, (long)tv.tv_usec);
+			return stampbuf;
+		}
+
 	}
 }
