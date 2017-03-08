@@ -127,7 +127,7 @@ namespace gr {
 				stampbuf[0] = 0;
 				return stampbuf;
 			}
-			snprintf(stampbuf, sizeof(stampbuf), "%s.%ld", strfbuf, (long)tv.tv_usec);
+			snprintf(stampbuf, sizeof(stampbuf), "%s.%06ld", strfbuf, (long)tv.tv_usec);
 			return stampbuf;
 		}
 
