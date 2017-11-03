@@ -49,7 +49,7 @@ namespace gr {
 
         void fvc_words_message(pmt::pmt_t msg);
         void queue(bvec &bv);
-        void queue(gr_uint32 val);
+        void queue(uint32_t val);
         int work(int noutput_items,
            gr_vector_const_void_star &input_items,
            gr_vector_void_star &output_items);

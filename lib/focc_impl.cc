@@ -92,7 +92,7 @@ namespace gr {
             }
         }
         void 
-        focc_impl::queue(gr_uint32 val) {
+        focc_impl::queue(uint32_t val) {
             for(int i = 0; i < 32; i++) {
                 queuebit(((val & 0x80000000) == 0x80000000) ? 1 : 0);
                 val = val << 1;

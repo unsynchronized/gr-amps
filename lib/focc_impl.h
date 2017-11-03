@@ -79,7 +79,7 @@ namespace gr {
         focc_frame *pop_frame_queue();
         void queue_file();
         void queue(shared_ptr<bvec> bvptr);
-        void queue(gr_uint32 val);
+        void queue(uint32_t val);
         int work(int noutput_items,
            gr_vector_const_void_star &input_items,
            gr_vector_void_star &output_items);
