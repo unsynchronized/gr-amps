@@ -12,6 +12,29 @@ Using this to transmit over the air could potentially disrupt legitimate transmi
 
 When using this tool, it is **your responsibility** to prevent bad things from happening.
 
+# Building
+
+Given the age of this codebase, it may be easiest to use the gnuradio 3.7 docker containers available in https://github.com/git-artes/docker-gnuradio as a build environment.
+
+To make this work using the 3.7 container:
+
+1. clone the docker-gnuradio repository
+2. add the line `RUN apt-get install -y libitpp-dev ` to the Dockerfile for gnuradio 3.7 just before the `USER gnuradio` line.
+3. use the instructions towards the bottom of the docker-gnuradio readme to build the container (this takes a while and you may need a few gigs of free space in your root filesystem)
+4. When running the container, use a local folder for persistence by replacing the `persistent-37` part of the `-v persistent-37:/home/gnuradio/persistent` flag of the run command with a full/absolute path to some folder on your machine. Ensure this folder contains your cloned copy of this repository.
+5. Run the following commands once inside the docker container:
+```
+cd persistence/gr-amps
+mkdir build
+cd build
+cmake ..
+make
+sudo make install
+```
+6. to start the gnuradio GUI, run `gnuradio-companion`. your AMPS blocks should be present.
+
+
+
 # The Blocks
 
 ### AMPS FOCC (forward control channel)
